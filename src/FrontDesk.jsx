@@ -9,9 +9,9 @@ import Workshops from "./components/specialSlides/Workshops";
 import useTime from "./hooks/useTime";
 
 export default function FrontDesk({}) {
-    const { alertActive } = useTime();
+    const { alertActive, openState } = useTime();
 
-    const slides = useMemo(
+    const slidesAll = useMemo(
         () => [
             {
                 component: <Hero key="hero" />,
@@ -21,16 +21,25 @@ export default function FrontDesk({}) {
             {
                 component: <Printers key="printers" />,
                 duration: 20000,
-                skip: false,
+                skipIfClosed: true,
             },
             {
                 component: <Workshops key="workshops" />,
                 duration: 20000,
-                skip: false,
+                skipIfClosed: true,
             },
         ],
         [],
     );
+
+    const slides = useMemo(() => {
+        const open = openState.openNow;
+        return slidesAll.filter((slide) => {
+            if (slide.skip) return false;
+            if (slide.skipIfClosed && !open) return false;
+            return true;
+        });
+    }, [slidesAll, openState]);
 
     const currentSlideIndex = useRef(0);
     const [currentSlide, setCurrentSlide] = useState(null);
@@ -50,12 +59,11 @@ export default function FrontDesk({}) {
     const incrimentSlide = useCallback(() => {
         // currentSlideIndex.current += 1;
 
-        // while (slides[currentSlideIndex.current].skip) {
-        currentSlideIndex.current += 1;
-        if (currentSlideIndex.current >= slides.length) {
+        if (currentSlideIndex.current + 1 >= slides.length) {
             currentSlideIndex.current = 0;
+        } else {
+            currentSlideIndex.current += 1;
         }
-        // }
     }, [slides]);
 
     useEffect(() => {
