@@ -5,8 +5,8 @@ import Markdown from "react-markdown";
 import { animateScroll, Element } from "react-scroll";
 import rehypeRaw from "rehype-raw";
 import remarkGfm from "remark-gfm";
-import useAirtable from "../../hooks/useAirtable";
 import useTheme from "../../hooks/useTheme";
+import useWebhook from "../../hooks/useWebhook";
 
 export default function Slides({}) {
     const { colorTheme } = useTheme();
@@ -17,7 +17,7 @@ export default function Slides({}) {
     const [currentSlide, setCurrentSlide] = useState(``);
     const currentSlideIndex = useRef(0);
 
-    const infoSlides = useAirtable("slides", 60000, (data) => {
+    const infoSlides = useWebhook("ticker/slides", 60000, (data) => {
         return data.map((slide) => {
             return {
                 title: slide.Title,

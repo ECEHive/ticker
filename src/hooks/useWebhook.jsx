@@ -1,18 +1,17 @@
 import { useCallback, useEffect, useState } from "react";
 
-export default function useAirtable(target, refreshInterval, processData = null) {
+export default function useWebhook(target, refreshInterval, processData = null) {
     const [fetchedData, setData] = useState([]);
 
     const fetchData = useCallback(async () => {
-        fetch(`https://n8n.lemmony.click/webhook/ticker?target=${target}`)
+        fetch(`https://n8n.hivemakerspace.com/webhook/${target}`)
             .then((response) => {
                 if (!response.ok) {
-                    throw new Error("couldn't fetch slides");
+                    throw new Error("couldn't fetch webhook data");
                 }
                 return response.json();
             })
             .then((data) => {
-                data = data.data;
                 let processedData = processData ? processData(data) : data;
                 if (JSON.stringify(processedData) === JSON.stringify(fetchedData)) return;
                 setData(processedData);

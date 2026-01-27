@@ -1,10 +1,19 @@
 import { Flex } from "@radix-ui/themes";
+import { useEffect } from "react";
 import hiveLogoWhite from "../../assets/hive_logo_onDark.svg";
 import idcSilhouette from "../../assets/idc_silhouette.svg";
 import useTime from "../../hooks/useTime";
 
-export default function Hero({}) {
+export default function Hero({ callback }) {
     const { openState } = useTime();
+
+    useEffect(() => {
+        let timeout = setTimeout(() => {
+            if (callback) callback();
+        }, 10000);
+
+        return () => clearTimeout(timeout);
+    }, [callback]);
 
     return (
         <>

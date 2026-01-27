@@ -1,14 +1,12 @@
 import { Cross1Icon } from "@radix-ui/react-icons";
 import { Dialog, Flex, IconButton, SegmentedControl } from "@radix-ui/themes";
 import { useCallback, useEffect, useState } from "react";
-import AnnouncementEditor from "./config/AnnouncementEditor";
 import GeneralEditor from "./config/GeneralEditor";
-import HoursEditor from "./config/HoursEditor";
 import SpotifyEditor from "./config/SpotifyEditor";
 
 export default function Config({}) {
     const [configOpen, setConfigOpen] = useState(false);
-    const [selectedTab, setSelectedTab] = useState("announcements");
+    const [selectedTab, setSelectedTab] = useState("general");
 
     useEffect(() => {
         // listen for escape key press
@@ -58,16 +56,12 @@ export default function Config({}) {
                         className="min-h-8 w-full"
                     >
                         <SegmentedControl.Item value="general">General</SegmentedControl.Item>
-                        <SegmentedControl.Item value="announcements">Announcements</SegmentedControl.Item>
                         <SegmentedControl.Item value="spotify">Spotify</SegmentedControl.Item>
-                        <SegmentedControl.Item value="hours">Hours</SegmentedControl.Item>
                     </SegmentedControl.Root>
 
                     <Flex direction="column" height="auto" width="100%" flexGrow="1" overflow="hidden">
                         {selectedTab === "general" && <GeneralEditor />}
-                        {selectedTab === "announcements" && <AnnouncementEditor />}
                         {selectedTab === "spotify" && <SpotifyEditor />}
-                        {selectedTab === "hours" && <HoursEditor />}
                     </Flex>
                 </Flex>
             </Dialog.Content>

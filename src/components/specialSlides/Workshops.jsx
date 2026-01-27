@@ -1,24 +1,17 @@
 import { Flex, Grid } from "@radix-ui/themes";
 import dayjs from "dayjs";
 import { motion } from "motion/react";
-import { useEffect } from "react";
-import useAirtable from "../../hooks/useAirtable";
+import useEvents from "../../hooks/useEvents";
 import SpecialSlideTemplate from "./Template";
 
-export default function Workshops({}) {
-    const workshopCalendar = useAirtable("workshops", 120000, (data) => {
-        return data.sort((a, b) => new Date(a["Event Date"]) - new Date(b["Event Date"]));
-    });
-
-    useEffect(() => {
-        console.log("workshopCalendar", workshopCalendar);
-    }, [workshopCalendar]);
+export default function Workshops({ callback }) {
+    const { events } = useEvents();
 
     return (
-        <SpecialSlideTemplate title="Upcoming Events & Workshops">
+        <SpecialSlideTemplate title="Upcoming Events & Workshops" callback={callback} timeout={20000}>
             <Grid width="100%" gap="4" height="100%" columns="5" rows="auto">
-                {workshopCalendar.length > 0 &&
-                    [...Array(21).keys()].map((dateOffset) => {
+                {events.length > 0 &&
+                    [...Array(14).keys()].map((dateOffset) => {
                         const day = dayjs()
                             .startOf("week")
                             .add(dateOffset + 1, "day")
@@ -27,8 +20,7 @@ export default function Workshops({}) {
                         // if it's a weekend skip
                         if (day.day() === 0 || day.day() === 6) return null;
 
-                        const events =
-                            workshopCalendar?.filter((event) => day.isSame(dayjs(event["Event Date"]), "day")) || [];
+                        const dayEvents = events?.filter((event) => day.isSame(dayjs(event["Date"]), "day")) || [];
                         const passed = day.isBefore(dayjs(), "day");
 
                         return (
@@ -41,11 +33,9 @@ export default function Workshops({}) {
                             >
                                 <p className="text-xl font-medium text-[--gray-11]">{day.format("ddd, MMM D")}</p>
 
-                                {events.length > 0 ? (
+                                {dayEvents.length > 0 ? (
                                     <>
-                                        {events.map((event, index) => {
-                                            const seatsOpen = event["Capacity"] - event["Attendees Registered"];
-
+                                        {dayEvents.map((event, index) => {
                                             return (
                                                 <motion.div
                                                     key={index}
@@ -56,22 +46,28 @@ export default function Workshops({}) {
                                                     <Flex direction="column" gap="1">
                                                         <p className="text-4xl font-semibold">{event["Name"]}</p>
                                                         <p className="text-2xl font-medium">
-                                                            {dayjs(event["Event Date"]).format("h:mm A")}
+                                                            {dayjs(event["Date"]).format("h:mm A")}
                                                         </p>
                                                     </Flex>
 
                                                     <Flex direction="column" gap="1">
-                                                        {seatsOpen !== 0 ? (
+                                                        {event["Remaining Slots"] !== 0 ? (
                                                             <span className="inline-flex text-3xl">
-                                                                <p className="font-mono font-medium">{seatsOpen}</p>
-                                                                <p className="text-[--gray-11]">&nbsp;open seats</p>
+                                                                <span className="font-mono font-medium">
+                                                                    {event["Remaining Slots"]}
+                                                                </span>
+                                                                <span className="text-[--gray-11]">
+                                                                    &nbsp;open seats
+                                                                </span>
                                                             </span>
                                                         ) : (
                                                             <span className="inline-flex text-3xl">
-                                                                <p className="font-mono font-medium">
-                                                                    {event["Waitlist Length"]}
-                                                                </p>
-                                                                <p className="text-[--gray-11]">&nbsp;on waitlist</p>
+                                                                <span className="font-mono font-medium">
+                                                                    {event["# Waitlist"]}
+                                                                </span>
+                                                                <span className="text-[--gray-11]">
+                                                                    &nbsp;on waitlist
+                                                                </span>
                                                             </span>
                                                         )}
                                                     </Flex>

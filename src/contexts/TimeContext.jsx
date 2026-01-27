@@ -1,5 +1,4 @@
 import { ClockIcon, ExitIcon, IdCardIcon, SunIcon, TrashIcon } from "@radix-ui/react-icons";
-import { useLocalStorage } from "@uidotdev/usehooks";
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
 import isBetween from "dayjs/plugin/isBetween";
@@ -28,51 +27,59 @@ function TimeProvider({ children }) {
     const [alertActive, setAlertActive] = useState(false);
     const [alertContent, setAlertContent] = useState(null);
 
-    const [hours, setHours] = useLocalStorage("open-hours", {
-        monday: {
-            open: true,
-            hours: ["10:00", "18:00"],
-        },
-        tuesday: {
-            open: true,
-            hours: ["10:00", "18:00"],
-        },
-        wednesday: {
-            open: true,
-            hours: ["10:00", "18:00"],
-        },
-        thursday: {
-            open: true,
-            hours: ["10:00", "18:00"],
-        },
-        friday: {
-            open: true,
-            hours: ["10:00", "18:00"],
-        },
-        saturday: {
-            open: false,
-            hours: ["", ""],
-        },
-        sunday: {
-            open: false,
-            hours: ["", ""],
-        },
+    const [hours, setHours] = useState({
+        openToday: false,
+        hours: [],
     });
 
+    useEffect(() => {
+        fetch("https://hums.hivemakerspace.com/api/rest/open-hours")
+            .then((res) => res.json())
+            .then((response) => {
+                const data = response.data;
+
+                // find currently active period
+                const period = data.periods.find((period) => {
+                    const start = dayjs.utc(period.periodStart);
+                    const end = dayjs.utc(period.periodEnd);
+                    return dayjs().isBetween(start, end, null, "[]");
+                });
+
+                // find today's hours
+                const today = period.schedule.find((day) => day.dayOfWeek === dayjs().day());
+                if (today) {
+                    // check if there's an exception covering today
+                    if (
+                        period.exceptions.find((exception) => {
+                            const start = dayjs.utc(exception.exceptionStart);
+                            const end = dayjs.utc(exception.exceptionEnd);
+                            return dayjs().isBetween(start, end, null, "[]");
+                        })
+                    ) {
+                        setHours({
+                            openToday: false,
+                            hours: [],
+                        });
+                    } else {
+                        setHours({
+                            openToday: true,
+                            hours: [today.ranges[0].start, today.ranges[0].end],
+                        });
+                    }
+                }
+            });
+    }, []);
+
     const openState = useMemo(() => {
-        const day = dayjs().format("dddd").toLowerCase();
-        const todayHours = hours[day];
-        console.log(todayHours);
+        if (hours.openToday) {
+            const openTime = timeRaw
+                .set("hour", hours.hours[0].split(":")[0])
+                .set("minute", hours.hours[0].split(":")[1]);
+            const closeTime = timeRaw
+                .set("hour", hours.hours[1].split(":")[0])
+                .set("minute", hours.hours[1].split(":")[1]);
 
-        if (todayHours.open) {
-            const openTime = dayjs()
-                .set("hour", todayHours.hours[0].split(":")[0])
-                .set("minute", todayHours.hours[0].split(":")[1]);
-            const closeTime = dayjs()
-                .set("hour", todayHours.hours[1].split(":")[0])
-                .set("minute", todayHours.hours[1].split(":")[1]);
-
-            if (dayjs().isBetween(openTime, closeTime, null, "[)")) {
+            if (timeRaw.isBetween(openTime, closeTime, null, "[)")) {
                 return {
                     openNow: true,
                     openToday: true,
@@ -91,7 +98,7 @@ function TimeProvider({ children }) {
                 openToday: false,
             };
         }
-    }, [hours]);
+    }, [hours, timeRaw]);
 
     useEffect(() => {
         const secondInterval = setInterval(() => {
@@ -130,7 +137,7 @@ function TimeProvider({ children }) {
         }
     }, [openState]);
 
-    // ALERT STUFF
+    // ALERT STUFF --------------------------------------------------------
     const alertTemplates = useMemo(
         () => ({
             hourly: (time) => {
@@ -287,7 +294,7 @@ function TimeProvider({ children }) {
     }, [timeRaw, openState, alertSchedule, alertTemplates]);
 
     return (
-        <TimeContext.Provider value={{ time, date, openState, hours, setHours, alertActive, alertContent, timeHelper }}>
+        <TimeContext.Provider value={{ time, date, openState, hours, alertActive, alertContent, timeHelper }}>
             {children}
         </TimeContext.Provider>
     );

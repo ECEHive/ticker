@@ -1,41 +1,32 @@
-import { Badge, Flex, Grid } from "@radix-ui/themes";
-// import Workshops from "./components/specialSlides/Workshops";
+import { Flex, Grid } from "@radix-ui/themes";
 
-// import Workshops from "./components/specialSlides/Workshops";
 import { motion } from "motion/react";
 import { useEffect } from "react";
-import useLiveSpaceData from "../../hooks/useLiveSpaceData";
-
-import dayjs from "dayjs";
+import { FaCubes, FaRegFaceFrown, FaRegFaceMeh, FaRegFaceSmile } from "react-icons/fa6";
+import QRCode from "react-qr-code";
 import bambuLogo from "../../assets/printing/bambu.svg";
 import formlabsLogo from "../../assets/printing/formlabs.svg";
+import useWebhook from "../../hooks/useWebhook";
 import SpecialSlideTemplate from "./Template";
 
-export default function Printers() {
-    const printerStates = useLiveSpaceData("getPrinters", 60000, (data) => {
-        let result = {
-            printers: data[0]?.result?.data?.json || [],
-        };
+export default function Printers({ callback }) {
+    const printerStates = useWebhook("queue", 60000, (data) => {
+        console.log(data);
+        let printers = data;
 
-        result.printers.forEach((printer) => {
-            printer.logo = getPrinterImage(printer.model);
+        // get printer icons
+        printers.printers = printers.printers
+            .map((printer) => {
+                return {
+                    ...printer,
+                    logo: getPrinterImage(printer.printerModel),
+                };
+            })
+            .sort((a, b) => {
+                return a.printerModel.localeCompare(b.printerModel);
+            });
 
-            if (printer.model.toLowerCase().includes("formlabs")) {
-                printer.shortModel = printer.model.replace("Formlabs ", "");
-            } else if (printer.model.toLowerCase().includes("bambu")) {
-                printer.shortModel = printer.model.replace("Bambu Lab", "");
-            }
-        });
-
-        // group printers by model
-        let byModel = {};
-        result.printers.forEach((printer) => {
-            if (!byModel[printer.model]) byModel[printer.model] = [];
-            byModel[printer.model].push(printer);
-        });
-        result.byModel = byModel;
-
-        return result;
+        return printers;
     });
 
     useEffect(() => {
@@ -49,10 +40,10 @@ export default function Printers() {
     };
 
     return (
-        <SpecialSlideTemplate title="3D Printing Queues">
-            <Grid className="" width="100%" gap="4" height="100%" columns="3" rows="auto">
-                {printerStates &&
-                    printerStates.printers.map((printer, index) => {
+        <SpecialSlideTemplate title="3D Printer Queues" callback={callback} timeout={200000}>
+            <Grid className="auto-rows-fr" width="100%" gap="4" height="100%" columns="3" rows="1fr">
+                {printerStates?.printers &&
+                    printerStates?.printers.map((printer, index) => {
                         return (
                             <motion.div
                                 key={index}
@@ -60,100 +51,135 @@ export default function Printers() {
                                 animate={{ opacity: 1 }}
                                 className="flex flex-col items-start justify-start gap-5 bg-zinc-800 p-5"
                             >
-                                <Flex direction="column" gap="4" width="100%">
-                                    <Flex direction="row" justify="between" align="start" width="100%" gap="3">
-                                        <span className="self-center text-[2.3rem] leading-none">
-                                            {printer.printerCount > 1 && (
-                                                <p className="font-semibold text-[--gray-11]">
-                                                    {printer.printerCount}x
-                                                </p>
-                                            )}
-                                            <p className="font-bold">{printer.name}</p>
-                                        </span>
-                                        <Badge color="gray" variant="outline" size="3" className="font-mono text-xl">
-                                            {printer.material}
-                                        </Badge>
-                                    </Flex>
+                                <Flex direction="column" gap="3" width="100%">
+                                    <span className="w-full text-[2.3rem] leading-none">
+                                        <span className="font-semibold text-[--gray-11]">{printer.printerCount}x </span>
+                                        <span className="font-bold">{printer.printerModel}</span>
+                                    </span>
 
-                                    <Flex direction="row" justify="start" align="end" width="100%">
-                                        <Flex direction="row" justify="between" width="100%" align="center">
-                                            <span className="inline-flex items-center">
-                                                <img
-                                                    src={printer.logo}
-                                                    alt="Formlabs logo"
-                                                    className="inline h-5 w-auto brightness-0 grayscale invert"
-                                                />
-                                                &nbsp;&nbsp;&nbsp;
-                                                <p className="text-2xl font-semibold leading-none">
-                                                    {printer.shortModel}
-                                                </p>
-                                            </span>
+                                    {printer.printerType === "formlabs" && (
+                                        <Flex direction="row" gap="2" justify="start" align="center" className="w-full">
+                                            <FaCubes className="text-[2.1rem]" />
+
+                                            <span className="text-3xl">{printer.printerMaterial} Resin</span>
                                         </Flex>
+                                    )}
+                                </Flex>
+
+                                <Flex direction="column" justify="start" align="start" gap="2" width="100%">
+                                    <Flex direction="row" gap="3" justify="between" align="center" className="w-full">
+                                        <Flex direction="row" gap="3" justify="start" align="center">
+                                            {printer.queuedJobCount === 0 ? (
+                                                <>
+                                                    <span className="inline-flex gap-3 text-3xl font-medium text-green-100">
+                                                        <FaRegFaceSmile className="text-[2.1rem] text-green-200" />
+                                                        No wait
+                                                    </span>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    {printer.queuedJobCount < 2 * printer.printerCount ? (
+                                                        <>
+                                                            <span className="inline-flex gap-3 text-3xl font-medium text-yellow-100">
+                                                                <FaRegFaceMeh className="text-[2.1rem] text-yellow-200" />
+                                                                Short wait
+                                                            </span>
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <span className="inline-flex gap-3 text-3xl font-medium text-red-100">
+                                                                <FaRegFaceFrown className="text-[2.1rem] text-red-200" />
+                                                                Long wait
+                                                            </span>
+                                                        </>
+                                                    )}
+                                                </>
+                                            )}
+                                        </Flex>
+
+                                        {printer.printerCount > 1 && printer.activeJobCount < printer.printerCount && (
+                                            <>
+                                                <span className="inline-flex items-center gap-0 text-3xl font-medium">
+                                                    <span className="inline font-semibold">
+                                                        {printer.printerCount - printer.activeJobCount}
+                                                    </span>
+                                                    <span className="text-[--gray-11]">
+                                                        &nbsp;printer
+                                                        {printer.printerCount - printer.activeJobCount !== 1
+                                                            ? "s"
+                                                            : ""}{" "}
+                                                        available
+                                                    </span>
+                                                </span>
+                                            </>
+                                        )}
                                     </Flex>
                                 </Flex>
 
-                                {printer.queueLength > 0 ? (
-                                    <Flex
-                                        direction="row"
-                                        justify="center"
-                                        align="end"
-                                        width="100%"
-                                        height="100%"
-                                        flexGrow="1"
-                                    >
-                                        <Flex direction="column" justify="start" align="start" gap="1" width="50%">
-                                            <p className="text-center font-mono text-6xl font-semibold">
-                                                {printer.queueLength}
-                                            </p>
-                                            <Flex direction="row" justify="start" align="center" width="100%">
-                                                <p className="text-2xl text-[--gray-11]">
-                                                    Print{printer.queueLength > 1 ? "s" : ""} queued
-                                                </p>
-                                            </Flex>
-                                        </Flex>
-
-                                        <Flex direction="column" justify="start" align="start" gap="1" width="50%">
-                                            <span className="inline-flex text-center text-6xl font-semibold">
-                                                <p className="font-mono">
-                                                    {dayjs.duration(printer.queueTime, "seconds").format("H")}
-                                                </p>
-                                                :
-                                                <p className="font-mono">
-                                                    {dayjs.duration(printer.queueTime, "seconds").format("mm")}
-                                                </p>
-                                            </span>
-                                            <Flex direction="row" justify="start" align="center" width="100%">
-                                                <p className="text-2xl text-[--gray-11]">Time till your print</p>
-                                            </Flex>
-                                        </Flex>
-                                    </Flex>
-                                ) : (
-                                    <Flex
-                                        direction="row"
-                                        justify="center"
-                                        align="center"
-                                        width="100%"
-                                        height="100%"
-                                        flexGrow="1"
-                                    >
-                                        <p className="text-4xl font-medium text-[--gray-8]">No prints queued</p>
-                                    </Flex>
-                                )}
+                                <Flex
+                                    direction="row"
+                                    justify="start"
+                                    align="end"
+                                    width="100%"
+                                    height="100%"
+                                    flexGrow="1"
+                                ></Flex>
                             </motion.div>
                         );
                     })}
-                {printerStates?.printers.length > 0 && (
+                {printerStates?.meta && (
                     <motion.div
-                        className="grid-flow-row bg-zinc-800 p-5"
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
+                        className="flex flex-row items-start justify-start gap-5 p-5"
                     >
-                        <p className="text-4xl font-medium">
-                            Queue times are estimates and are not guaranteed.
-                            <br />
-                            <br />
-                            Ask a PI for help adding your print to the queue!
-                        </p>
+                        <Flex direction="row" justify="start" align="start" gap="4" width="100%" height="100%">
+                            <p className="h-full w-min text-3xl font-medium">
+                                Check your print&apos;s status at hive.pluraprint.com
+                            </p>
+                            <div className="flex flex-grow flex-row items-start justify-end">
+                                <QRCode
+                                    value="https://hive.pluraprint.com"
+                                    size={175}
+                                    bgColor="transparent"
+                                    fgColor="white"
+                                    className="h-full"
+                                />
+                            </div>
+                        </Flex>
+
+                        {/* <Separator orientation="vertical" size="4" className="mx-4" />
+
+                        <Flex direction="row" justify="between" align="center" gap="9" flexGrow="1" height="100%">
+                            <Flex direction="column" justify="start" align="start" gap="1">
+                                <p className="text-center font-mono text-6xl font-semibold">
+                                    {printerStates?.meta?.activePrinterCount}
+                                </p>
+                                <Flex direction="row" justify="start" align="center" width="100%">
+                                    <p className="text-2xl text-[--gray-11]">Active printers</p>
+                                </Flex>
+                            </Flex>
+
+                            <Flex direction="column" justify="start" align="start" gap="1">
+                                <p className="text-center font-mono text-6xl font-semibold">
+                                    {printerStates?.meta?.totalJobCount}
+                                </p>
+                                <Flex direction="row" justify="start" align="center" width="100%">
+                                    <p className="text-2xl text-[--gray-11]">
+                                        Print{printerStates?.meta?.totalJobCount > 1 ? "s" : ""} queued
+                                    </p>
+                                </Flex>
+                            </Flex>
+
+                            <Flex direction="column" justify="start" align="start" gap="1">
+                                <p className="text-center text-6xl font-semibold">
+                                    {dayjs.duration(printerStates?.meta?.totalSeconds || 0, "seconds").humanize()}
+                                </p>
+                                <Flex direction="row" justify="start" align="center" width="100%">
+                                    <p className="text-2xl text-[--gray-11]">Total print time</p>
+                                </Flex>
+                            </Flex>
+                        </Flex> */}
                     </motion.div>
                 )}
             </Grid>

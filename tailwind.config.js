@@ -22,7 +22,7 @@ export default {
                         fontSize: "4em",
                         h1: {
                             ...defaultTypograhyStyle,
-                            marginBottom: ".3em",
+                            marginBottom: ".2em",
                             lineHeight: "1em",
                         },
                         h2: {
@@ -40,13 +40,17 @@ export default {
                         p: {
                             ...defaultTypograhyStyle,
                             fontSize: "1.275em",
-                            lineHeight: "1em",
+                            lineHeight: "1.2em",
                         },
-                        // increase all font sizes in table
+                        hr: {
+                            marginTop: "1em",
+                            marginBottom: "1em",
+                        },
+
                         table: {
                             fontSize: "1em",
-                            marginBottom: "1.25em",
-                            marginTop: "1.25em",
+                            marginBottom: ".8em",
+                            marginTop: ".8em",
                         },
                     },
                 },
