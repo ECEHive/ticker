@@ -36,6 +36,7 @@ function TimeProvider({ children }) {
         fetch("https://hums.hivemakerspace.com/api/rest/open-hours")
             .then((res) => res.json())
             .then((response) => {
+                console.log("time", response);
                 const data = response.data;
 
                 // find currently active period
@@ -44,15 +45,17 @@ function TimeProvider({ children }) {
                     const end = dayjs.utc(period.periodEnd);
                     return dayjs().isBetween(start, end, null, "[]");
                 });
+                console.log("period", period);
 
                 // find today's hours
                 const today = period.schedule.find((day) => day.dayOfWeek === dayjs().day());
                 if (today) {
+                    console.log("today", today);
                     // check if there's an exception covering today
                     if (
                         period.exceptions.find((exception) => {
-                            const start = dayjs.utc(exception.exceptionStart);
-                            const end = dayjs.utc(exception.exceptionEnd);
+                            const start = dayjs.utc(exception.start);
+                            const end = dayjs.utc(exception.end);
                             return dayjs().isBetween(start, end, null, "[]");
                         })
                     ) {
@@ -71,6 +74,7 @@ function TimeProvider({ children }) {
     }, []);
 
     const openState = useMemo(() => {
+        console.log(hours);
         if (hours.openToday) {
             const openTime = timeRaw
                 .set("hour", hours.hours[0].split(":")[0])
