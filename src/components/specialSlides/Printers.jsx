@@ -40,7 +40,7 @@ export default function Printers({ callback }) {
     };
 
     return (
-        <SpecialSlideTemplate title="3D Printer Queues" callback={callback} timeout={200000}>
+        <SpecialSlideTemplate title="3D Printer Queues" callback={callback} timeout={20000}>
             <Grid className="auto-rows-fr" width="100%" gap="4" height="100%" columns="3" rows="1fr">
                 {printerStates?.printers &&
                     printerStates?.printers.map((printer, index) => {
