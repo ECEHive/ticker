@@ -1,11 +1,11 @@
 import { Flex } from "@radix-ui/themes";
-import Alert from "./components/MainAlert";
 import Hero from "./components/specialSlides/Hero";
 // import Workshops from "./components/specialSlides/Workshops";
 import { AnimatePresence, motion } from "motion/react";
 import React, { useCallback, useMemo, useState } from "react";
+import Calendar from "./components/specialSlides/Calendar";
 import Printers from "./components/specialSlides/Printers";
-import Workshops from "./components/specialSlides/Workshops";
+import ThisWeek from "./components/specialSlides/ThisWeek";
 import useTime from "./hooks/useTime";
 
 export default function FrontDesk({}) {
@@ -22,13 +22,13 @@ export default function FrontDesk({}) {
                 skipIfClosed: false,
             },
             {
-                component: <Workshops key="workshops" />,
+                component: <Calendar key="calendar" />,
                 skipIfClosed: false,
             },
-            // {
-            //     component: <ThisWeek key="thisweek" />,
-            //     skipIfClosed: false,
-            // },
+            {
+                component: <ThisWeek key="thisweek" />,
+                skipIfClosed: false,
+            },
         ],
         [],
     );
@@ -73,30 +73,30 @@ export default function FrontDesk({}) {
                     incrementSlide();
                 }}
             >
-                {alertActive ? (
+                {/* {alertActive ? (
                     <>
                         <Alert />
                     </>
-                ) : (
-                    <AnimatePresence mode="wait">
-                        <motion.div
-                            // fade the div when currentSlide changes
-                            key={slideIndex || "empty"}
-                            initial={{ x: 10, opacity: 0 }}
-                            animate={{ x: 0, opacity: 1 }}
-                            exit={{ x: -10, opacity: 0 }}
-                            transition={{ duration: 0.2 }}
-                            className="h-full max-h-full w-full max-w-full"
-                        >
-                            {/* add an index prop to currentSlide */}
-                            {React.cloneElement(slides[slideIndex].component, {
-                                callback: incrementSlide,
-                            })}
+                ) : ( */}
+                <AnimatePresence mode="wait">
+                    <motion.div
+                        // fade the div when currentSlide changes
+                        key={slideIndex || "empty"}
+                        initial={{ x: 10, opacity: 0 }}
+                        animate={{ x: 0, opacity: 1 }}
+                        exit={{ x: -10, opacity: 0 }}
+                        transition={{ duration: 0.2 }}
+                        className="h-full max-h-full w-full max-w-full"
+                    >
+                        {/* add an index prop to currentSlide */}
+                        {React.cloneElement(slides[slideIndex].component, {
+                            callback: incrementSlide,
+                        })}
 
-                            {/* <div name="bottom" ref={null} /> */}
-                        </motion.div>
-                    </AnimatePresence>
-                )}
+                        {/* <div name="bottom" ref={null} /> */}
+                    </motion.div>
+                </AnimatePresence>
+                {/* )} */}
             </Flex>
         </>
     );

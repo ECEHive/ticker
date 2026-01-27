@@ -49,25 +49,33 @@ export default function Printers({ callback }) {
                                 key={index}
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
-                                className="flex flex-col items-start justify-start gap-5 bg-zinc-800 p-5"
+                                className="flex flex-col items-start justify-start gap-3 bg-zinc-800 p-5"
                             >
                                 <Flex direction="column" gap="3" width="100%">
                                     <span className="w-full text-[2.3rem] leading-none">
                                         <span className="font-semibold text-[--gray-11]">{printer.printerCount}x </span>
                                         <span className="font-bold">{printer.printerModel}</span>
                                     </span>
-
-                                    {printer.printerType === "formlabs" && (
-                                        <Flex direction="row" gap="2" justify="start" align="center" className="w-full">
-                                            <FaCubes className="text-[2.1rem]" />
-
-                                            <span className="text-3xl">{printer.printerMaterial} Resin</span>
-                                        </Flex>
-                                    )}
                                 </Flex>
 
-                                <Flex direction="column" justify="start" align="start" gap="2" width="100%">
-                                    <Flex direction="row" gap="3" justify="between" align="center" className="w-full">
+                                <Flex direction="column" justify="start" align="start" gap="4" width="100%">
+                                    <Flex direction="row" gap="3" justify="between" align="center" width="100%">
+                                        <Flex
+                                            direction="row"
+                                            gap="2"
+                                            justify="start"
+                                            align="center"
+                                            className="text-[--gray-11]"
+                                        >
+                                            <FaCubes className="text-[2.1rem]" />
+
+                                            {printer.printerType === "formlabs" ? (
+                                                <span className="text-3xl">{printer.printerMaterial} Resin</span>
+                                            ) : (
+                                                <span className="text-3xl">Mixed plastics</span>
+                                            )}
+                                        </Flex>
+
                                         <Flex direction="row" gap="3" justify="start" align="center">
                                             {printer.queuedJobCount === 0 ? (
                                                 <>
@@ -78,7 +86,7 @@ export default function Printers({ callback }) {
                                                 </>
                                             ) : (
                                                 <>
-                                                    {printer.queuedJobCount < 2 * printer.printerCount ? (
+                                                    {printer.queuedJobCount < 3 * printer.printerCount ? (
                                                         <>
                                                             <span className="inline-flex gap-3 text-3xl font-medium text-yellow-100">
                                                                 <FaRegFaceMeh className="text-[2.1rem] text-yellow-200" />
@@ -96,24 +104,23 @@ export default function Printers({ callback }) {
                                                 </>
                                             )}
                                         </Flex>
-
-                                        {printer.printerCount > 1 && printer.activeJobCount < printer.printerCount && (
-                                            <>
-                                                <span className="inline-flex items-center gap-0 text-3xl font-medium">
-                                                    <span className="inline font-semibold">
-                                                        {printer.printerCount - printer.activeJobCount}
-                                                    </span>
-                                                    <span className="text-[--gray-11]">
-                                                        &nbsp;printer
-                                                        {printer.printerCount - printer.activeJobCount !== 1
-                                                            ? "s"
-                                                            : ""}{" "}
-                                                        available
-                                                    </span>
-                                                </span>
-                                            </>
-                                        )}
                                     </Flex>
+                                    {printer.printerCount > 1 && printer.activeJobCount < printer.printerCount && (
+                                        <>
+                                            <span className="inline-flex items-center gap-0 text-3xl font-medium">
+                                                <span className="inline font-semibold">
+                                                    {printer.printerCount - printer.activeJobCount}
+                                                </span>
+                                                <span className="text-[--gray-11]">
+                                                    &nbsp;printer
+                                                    {printer.printerCount - printer.activeJobCount !== 1
+                                                        ? "s"
+                                                        : ""}{" "}
+                                                    available
+                                                </span>
+                                            </span>
+                                        </>
+                                    )}
                                 </Flex>
 
                                 <Flex
