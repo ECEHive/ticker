@@ -5,11 +5,10 @@ import { AnimatePresence, motion } from "motion/react";
 import React, { useCallback, useMemo, useState } from "react";
 import Calendar from "./components/specialSlides/Calendar";
 import Printers from "./components/specialSlides/Printers";
-import ThisWeek from "./components/specialSlides/ThisWeek";
 import useTime from "./hooks/useTime";
 
 export default function FrontDesk({}) {
-    const { alertActive, openState } = useTime();
+    const { openState } = useTime();
 
     const slidesAll = useMemo(
         () => [
@@ -25,10 +24,10 @@ export default function FrontDesk({}) {
                 component: <Calendar key="calendar" />,
                 skipIfClosed: false,
             },
-            {
-                component: <ThisWeek key="thisweek" />,
-                skipIfClosed: false,
-            },
+            // {
+            //     component: <ThisWeek key="thisweek" />,
+            //     skipIfClosed: false,
+            // },
         ],
         [],
     );
