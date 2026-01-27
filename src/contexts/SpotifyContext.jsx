@@ -12,7 +12,7 @@ const clientId = "7fdaa0130bac49f39a77a5607d7a15fe"; // your clientId
 
 // detect if running locally or on the regular url
 const redirectUrl =
-    window.location.hostname === "localhost" ? "https://localhost:5173" : "https://ticker.hivemakerspace.com/";
+    window.location.hostname === "127.0.0.1" ? "http://127.0.0.1:5173" : "https://ticker.hivemakerspace.com/";
 
 // eslint-disable-next-line react/prop-types
 export const SpotifyProvider = ({ children }) => {
