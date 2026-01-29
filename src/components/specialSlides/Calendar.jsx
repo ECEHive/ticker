@@ -1,6 +1,5 @@
 import { Flex, Grid } from "@radix-ui/themes";
 import dayjs from "dayjs";
-import { motion } from "motion/react";
 import useEvents from "../../hooks/useEvents";
 import SpecialSlideTemplate from "./Template";
 
@@ -25,12 +24,20 @@ export default function Calendar({ callback }) {
                             const passed = day.isBefore(dayjs(), "day");
 
                             return (
-                                <motion.div
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: passed ? 0.5 : 1 }}
-                                    transition={{ delay: dateOffset * 0.01 }}
+                                // <motion.div
+                                //     initial={{ opacity: 0 }}
+                                //     animate={{ opacity: passed ? 0.5 : 1 }}
+                                //     transition={{ delay: dateOffset * 0.01 }}
+                                //     key={dateOffset}
+                                //     className={`flex flex-col items-start justify-start gap-2 }
+                                // >
+                                <Flex
+                                    direction="column"
+                                    align="start"
+                                    justify="start"
+                                    gap="2"
                                     key={dateOffset}
-                                    className={`flex flex-col items-start justify-start gap-2 ${day.isSame(dayjs(), "day") && "border-4 border-amber-100"} bg-zinc-800 p-5`}
+                                    className={`${day.isSame(dayjs(), "day") && "border-4 border-amber-100"} bg-zinc-800 p-5 ${day.isBefore(dayjs(), "day") ? "opacity-50" : ""}`}
                                 >
                                     <p className="text-xl font-medium text-[--gray-11]">{day.format("ddd, MMM D")}</p>
 
@@ -38,12 +45,7 @@ export default function Calendar({ callback }) {
                                         <>
                                             {dayEvents.map((event, index) => {
                                                 return (
-                                                    <motion.div
-                                                        key={index}
-                                                        initial={{ opacity: 0 }}
-                                                        animate={{ opacity: 1 }}
-                                                        className={`flex flex-col gap-2`}
-                                                    >
+                                                    <Flex key={index} direction="column" gap="2">
                                                         <Flex direction="column" gap="1">
                                                             <p className="hyphens-auto text-3xl font-semibold">
                                                                 {event["Name"]}
@@ -74,7 +76,7 @@ export default function Calendar({ callback }) {
                                                                 </span>
                                                             )}
                                                         </Flex> */}
-                                                    </motion.div>
+                                                    </Flex>
                                                 );
                                             })}
                                         </>
@@ -88,7 +90,7 @@ export default function Calendar({ callback }) {
                                             {/* <p className="text-3xl font-medium text-[--gray-8]">No events</p> */}
                                         </Flex>
                                     )}
-                                </motion.div>
+                                </Flex>
                             );
                         })}
                 </Grid>

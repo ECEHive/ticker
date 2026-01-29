@@ -6,6 +6,7 @@ import React, { useCallback, useMemo, useState } from "react";
 import Calendar from "./components/specialSlides/Calendar";
 import Printers from "./components/specialSlides/Printers";
 import QRCodes from "./components/specialSlides/QRCodes";
+import ThisWeek from "./components/specialSlides/ThisWeek";
 import useTime from "./hooks/useTime";
 
 export default function FrontDesk({}) {
@@ -29,10 +30,10 @@ export default function FrontDesk({}) {
                 component: <QRCodes key="qrcodes" />,
                 skipIfClosed: false,
             },
-            // {
-            //     component: <ThisWeek key="thisweek" />,
-            //     skipIfClosed: false,
-            // },
+            {
+                component: <ThisWeek key="thisweek" />,
+                skipIfClosed: false,
+            },
         ],
         [],
     );
@@ -40,7 +41,7 @@ export default function FrontDesk({}) {
     const slides = useMemo(() => {
         const open = openState.openNow;
         return slidesAll.filter((slide) => {
-            if (slide.skip) return false;
+            if (slide?.skip) return false;
             if (slide.skipIfClosed && !open) return false;
             return true;
         });
@@ -77,11 +78,6 @@ export default function FrontDesk({}) {
                     incrementSlide();
                 }}
             >
-                {/* {alertActive ? (
-                    <>
-                        <Alert />
-                    </>
-                ) : ( */}
                 <AnimatePresence mode="wait">
                     <motion.div
                         // fade the div when currentSlide changes
