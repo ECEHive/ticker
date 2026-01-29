@@ -161,9 +161,17 @@ export default function Printers({ callback }) {
                     </>
                 </Grid>
             ) : (
-                <Flex direction="row" height="100%" width="100%" justify="center" align="center" gap="4">
+                <Flex
+                    direction="row"
+                    height="100%"
+                    width="100%"
+                    justify="center"
+                    align="center"
+                    gap="4"
+                    className="text-[--gray-11]"
+                >
                     <Spinner size="3" />
-                    <span className="text-3xl font-medium">Fetching the latest data...</span>
+                    <span className="text-4xl font-medium">Fetching the latest data...</span>
                 </Flex>
             )}
         </SpecialSlideTemplate>

@@ -24,20 +24,13 @@ export default function Calendar({ callback }) {
                             const passed = day.isBefore(dayjs(), "day");
 
                             return (
-                                // <motion.div
-                                //     initial={{ opacity: 0 }}
-                                //     animate={{ opacity: passed ? 0.5 : 1 }}
-                                //     transition={{ delay: dateOffset * 0.01 }}
-                                //     key={dateOffset}
-                                //     className={`flex flex-col items-start justify-start gap-2 }
-                                // >
                                 <Flex
                                     direction="column"
                                     align="start"
                                     justify="start"
                                     gap="2"
                                     key={dateOffset}
-                                    className={`${day.isSame(dayjs(), "day") && "border-4 border-amber-100"} bg-zinc-800 p-5 ${day.isBefore(dayjs(), "day") ? "opacity-50" : ""}`}
+                                    className={`${day.isSame(dayjs(), "day") && "border-4 border-amber-100"} bg-zinc-800 p-5 ${passed ? "opacity-50" : ""}`}
                                 >
                                     <p className="text-xl font-medium text-[--gray-11]">{day.format("ddd, MMM D")}</p>
 
@@ -54,28 +47,6 @@ export default function Calendar({ callback }) {
                                                                 {dayjs(event["Date"]).format("h:mm A")}
                                                             </p>
                                                         </Flex>
-
-                                                        {/* <Flex direction="column" gap="1">
-                                                            {event["Remaining Slots"] !== 0 ? (
-                                                                <span className="inline-flex text-3xl">
-                                                                    <span className="font-mono font-medium">
-                                                                        {event["Remaining Slots"]}
-                                                                    </span>
-                                                                    <span className="text-[--gray-11]">
-                                                                        &nbsp;open seats
-                                                                    </span>
-                                                                </span>
-                                                            ) : (
-                                                                <span className="inline-flex text-3xl">
-                                                                    <span className="font-mono font-medium">
-                                                                        {event["# Waitlist"]}
-                                                                    </span>
-                                                                    <span className="text-[--gray-11]">
-                                                                        &nbsp;on waitlist
-                                                                    </span>
-                                                                </span>
-                                                            )}
-                                                        </Flex> */}
                                                     </Flex>
                                                 );
                                             })}
