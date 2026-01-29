@@ -1,6 +1,5 @@
-import { Flex, Separator } from "@radix-ui/themes";
+import { Flex } from "@radix-ui/themes";
 import { useEffect } from "react";
-import QRCode from "react-qr-code";
 import hiveLogoWhite from "../../assets/hive_logo_onDark.svg";
 import idcSilhouette from "../../assets/idc_silhouette.svg";
 import useTime from "../../hooks/useTime";
@@ -54,28 +53,6 @@ export default function Hero({ callback }) {
                                 <p>closed</p>
                             </span>
                         )}
-                    </Flex>
-
-                    <Flex direction="row" position="absolute" bottom="0" justify="center" align="center" gap="9">
-                        <Flex direction="row" justify="center" align="center" gap="6">
-                            <QRCode
-                                value="newsletter.hivemakerspace.com"
-                                fgColor="white"
-                                bgColor="transparent"
-                                size={100}
-                            />
-                            <span className="text-3xl font-bold">Sign up for our newsletter!</span>
-                        </Flex>
-                        <Separator orientation="vertical" />
-                        <Flex direction="row" justify="center" align="center" gap="6">
-                            <span className="text-3xl font-bold">Sign up for workshops!</span>
-                            <QRCode
-                                value="newsletter.hivemakerspace.com"
-                                fgColor="white"
-                                bgColor="transparent"
-                                size={100}
-                            />
-                        </Flex>
                     </Flex>
                 </Flex>
                 <Flex height="100%" width="100%" position="absolute" justify="center" align="center" className="z-0">

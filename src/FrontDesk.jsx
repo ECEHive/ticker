@@ -5,6 +5,7 @@ import { AnimatePresence, motion } from "motion/react";
 import React, { useCallback, useMemo, useState } from "react";
 import Calendar from "./components/specialSlides/Calendar";
 import Printers from "./components/specialSlides/Printers";
+import QRCodes from "./components/specialSlides/QRCodes";
 import useTime from "./hooks/useTime";
 
 export default function FrontDesk({}) {
@@ -22,6 +23,10 @@ export default function FrontDesk({}) {
             },
             {
                 component: <Calendar key="calendar" />,
+                skipIfClosed: false,
+            },
+            {
+                component: <QRCodes key="qrcodes" />,
                 skipIfClosed: false,
             },
             // {
