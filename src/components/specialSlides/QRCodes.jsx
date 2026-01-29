@@ -17,7 +17,7 @@ function Tile({ text, link }) {
 
 export default function QRCodes({ callback }) {
     return (
-        <SpecialSlideTemplate title="Stay Connected" callback={callback} timeout={2000000}>
+        <SpecialSlideTemplate title="Stay Connected" callback={callback} timeout={20000}>
             <Grid className="auto-rows-fr gap-10" width="100%" height="100%" columns="1fr 1fr" p="7">
                 <Tile text="Sign up for our newsletter" link="newsletter.hivemakerspace.com" />
                 <Tile text="Sign up for upcoming workshops" link="workshops.hivemakerspace.com" />
