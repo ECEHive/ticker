@@ -39,8 +39,15 @@ export default function Printers({ callback }) {
         else return null;
     };
 
+    const getBambuMaterials = (model) => {
+        if (model.toLowerCase().includes("p1s")) return "PLA, TPU";
+        else if (model.toLowerCase().includes("h2d")) return "Specialty";
+        else if (model.toLowerCase().includes("h2s")) return "Specialty";
+        return "";
+    };
+
     return (
-        <SpecialSlideTemplate title="3D Printer Queues" callback={callback} timeout={20000}>
+        <SpecialSlideTemplate title="3D Printer Queues" callback={callback} timeout={2000000}>
             {printerStates?.printers ? (
                 <Grid className="auto-rows-fr" width="100%" gap="4" height="100%" columns="3" rows="1fr">
                     <>
@@ -75,7 +82,11 @@ export default function Printers({ callback }) {
                                                 {printer.printerType === "formlabs" ? (
                                                     <span className="text-3xl">{printer.printerMaterial} Resin</span>
                                                 ) : (
-                                                    <span className="text-3xl">Mixed plastics</span>
+                                                    <>
+                                                        <span className="text-3xl">
+                                                            {getBambuMaterials(printer.printerModel)}
+                                                        </span>
+                                                    </>
                                                 )}
                                             </Flex>
 
