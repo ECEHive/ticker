@@ -6,7 +6,7 @@ import React, { useCallback, useMemo, useState } from "react";
 import Calendar from "./components/specialSlides/Calendar";
 import Printers from "./components/specialSlides/Printers";
 import QRCodes from "./components/specialSlides/QRCodes";
-import ThisWeek from "./components/specialSlides/ThisWeek";
+import Workshops from "./components/specialSlides/Workshops";
 import useTime from "./hooks/useTime";
 
 export default function FrontDesk({}) {
@@ -27,11 +27,11 @@ export default function FrontDesk({}) {
                 skipIfClosed: false,
             },
             {
-                component: <QRCodes key="qrcodes" />,
+                component: <Workshops key="workshops" />,
                 skipIfClosed: false,
             },
             {
-                component: <ThisWeek key="thisweek" />,
+                component: <QRCodes key="qrcodes" />,
                 skipIfClosed: false,
             },
         ],

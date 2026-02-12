@@ -115,9 +115,7 @@ export default function ThisWeek({ callback }) {
                                                 />
                                             </>
                                         ) : (
-                                            <>
-                                                <p className="text-3xl font-medium">Full</p>
-                                            </>
+                                            <>{/* <p className="text-3xl font-medium">Full</p> */}</>
                                         )}
                                     </Flex>
                                 </Flex>

@@ -156,7 +156,7 @@ export default function Printers({ callback }) {
                         >
                             <Flex direction="row" justify="start" align="start" gap="4" width="100%" height="100%">
                                 <p className="h-full w-min text-3xl font-medium">
-                                    Check your print&apos;s status at hive.pluraprint.com
+                                    Check your Bambu print&apos;s status at hive.pluraprint.com
                                 </p>
                                 <div className="flex flex-grow flex-row items-start justify-end">
                                     <QRCode
