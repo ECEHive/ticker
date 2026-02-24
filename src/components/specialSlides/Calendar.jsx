@@ -11,7 +11,7 @@ export default function Calendar({ callback }) {
             <Flex direction="row" justify="start" align="center" gap="4" width="100%" height="100%">
                 <Grid width="100%" gap="4" height="100%" columns="5" rows="auto">
                     {events.length > 0 &&
-                        [...Array(28).keys()].map((dateOffset) => {
+                        [...Array(21).keys()].map((dateOffset) => {
                             const day = dayjs()
                                 .startOf("week")
                                 .add(dateOffset + 1, "day")

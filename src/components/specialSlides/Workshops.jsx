@@ -1,6 +1,6 @@
 import { Box, Flex, Separator } from "@radix-ui/themes";
 import dayjs from "dayjs";
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, useRef } from "react";
 import { scroller } from "react-scroll";
 import useEvents from "../../hooks/useEvents";
 import SpecialSlideTemplate from "./Template";
@@ -15,33 +15,28 @@ export default function Workshops({ callback }) {
             .sort((a, b) => new Date(a["Date"]) - new Date(b["Date"]));
     }, [events]);
 
-    const delay = 12500;
+    const delay = 10000;
+    const index = useRef(1);
 
     useEffect(() => {
         if (workshopCalendar.length > 0) {
-            const timer1 = setTimeout(() => {
-                let index = 0;
-                const scrollInterval = setInterval(() => {
-                    index++;
-                    if (index >= workshopCalendar.length) {
-                        clearInterval(scrollInterval);
-                        callback();
-                        return;
-                    }
-
-                    scroller.scrollTo(`event-${index}`, {
-                        duration: 750,
-                        delay: 0,
-                        smooth: "easeInOutQuart",
-                        containerId: "container",
-                    });
-                }, delay);
-                return () => {
+            const scrollInterval = setInterval(() => {
+                if (index.current >= workshopCalendar.length) {
                     clearInterval(scrollInterval);
-                };
+                    callback();
+                    return;
+                }
+
+                scroller.scrollTo(`event-${index.current}`, {
+                    duration: 750,
+                    delay: 0,
+                    smooth: "easeInOutQuart",
+                    containerId: "container",
+                });
+                index.current++;
             }, delay);
             return () => {
-                clearTimeout(timer1);
+                clearInterval(scrollInterval);
             };
         }
     }, [callback, workshopCalendar]);
