@@ -15,6 +15,7 @@ export default function Slides({}) {
     const boxRef = useRef(null);
 
     const [currentSlide, setCurrentSlide] = useState(``);
+    const [title, setTitle] = useState("");
     const currentSlideIndex = useRef(0);
 
     const infoSlides = useWebhook("ticker/slides", 60000, (data) => {
@@ -67,12 +68,15 @@ export default function Slides({}) {
     }, [runScroll]);
 
     const loadSlide = useCallback((content) => {
-        setCurrentSlide(content);
+        if (!content) return;
+        console.log(content);
+        setCurrentSlide(content.content);
+        setTitle(content.title.length > 0 ? content.title : "");
     }, []);
 
     useEffect(() => {
         currentSlideIndex.current = 0;
-        loadSlide("");
+        loadSlide(null);
 
         let ready = true;
         const interval = setInterval(() => {
@@ -88,7 +92,7 @@ export default function Slides({}) {
                 containerId: "container",
             });
 
-            loadSlide(slidesFiltered[currentSlideIndex.current]?.content);
+            loadSlide(slidesFiltered[currentSlideIndex.current]);
             ready = false;
             runSlide().then(() => {
                 currentSlideIndex.current = (currentSlideIndex.current + 1) % slidesFiltered.length;
@@ -131,6 +135,7 @@ export default function Slides({}) {
                             overflow: "hidden",
                         }}
                     >
+                        {/* <p className="m-0 mb-6 p-0 text-[7em] font-bold leading-none">{title}</p> */}
                         <Markdown
                             className={`prose prose-2xl prose-neutral ${colorTheme === "dark" && "prose-invert"} overflow-hidden`}
                             remarkPlugins={[remarkGfm]}
@@ -138,6 +143,13 @@ export default function Slides({}) {
                         >
                             {currentSlide}
                         </Markdown>
+
+                        {/* <QRCode
+                            value="https://www.hivelearningcenter.org/events/"
+                            bgColor="transparent"
+                            fgColor="white"
+                        /> */}
+
                         <div name="bottom" ref={mdRef} />
                     </Element>
                 </motion.div>
