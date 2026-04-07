@@ -1,5 +1,6 @@
 /** @type {import('tailwindcss').Config} */
-const { themeVariants, prefersLight, prefersDark } = require("tailwindcss-theme-variants");
+import typography from "@tailwindcss/typography";
+import { themeVariants, prefersLight, prefersDark } from "tailwindcss-theme-variants";
 
 const defaultTypograhyStyle = {
     marginTop: ".6em",
@@ -58,7 +59,7 @@ export default {
         },
     },
     plugins: [
-        require("@tailwindcss/typography"),
+        typography,
         themeVariants({
             themes: {
                 light: {
