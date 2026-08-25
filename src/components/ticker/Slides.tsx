@@ -12,7 +12,7 @@ import remarkGfm from "remark-gfm";
 const SCROLL_SPEED = 20; // pixels per second
 const TIME_PADDING = 2500; // ms buffer between slides
 
-export default function Slides() {
+export default function Slides({ slidesOverride }: { slidesOverride?: Slide[] }) {
     const { colorTheme } = useTheme();
     const mdRef = useRef<HTMLDivElement>(null);
     const boxRef = useRef<HTMLDivElement>(null);
@@ -27,11 +27,16 @@ export default function Slides() {
     const rawSlides = useWebhook<RawSlide[]>("ticker/slides", 60000, processSlides);
 
     const slides = useMemo<Slide[]>(() => {
+        if (slidesOverride) {
+            console.log(slidesOverride);
+            return slidesOverride
+        }
+
         if (!rawSlides) return [];
         return (rawSlides as RawSlide[])
             .filter((s) => s.Enabled)
             .map((s) => ({ title: s.Title, content: s.Content, enabled: s.Enabled }));
-    }, [rawSlides]);
+    }, [rawSlides, slidesOverride]);
 
     const runScroll = useCallback((duration: number) => {
         animateScroll.scrollToBottom({

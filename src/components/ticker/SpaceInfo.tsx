@@ -75,11 +75,10 @@ export default function SpaceInfo() {
                                     transition={{ duration: 0.2, ease: "easeOut" }}
                                 >
                                     <p
-                                        className={`${
-                                            getDigit(time[0]) !== ":"
+                                        className={`${getDigit(time[0]) !== ":"
                                                 ? "font-mono text-[9.8rem] font-semibold"
                                                 : "font-sans text-[9.8rem] font-medium"
-                                        } leading-none`}
+                                            } leading-none`}
                                     >
                                         {getDigit(time[0])}
                                     </p>
@@ -98,7 +97,7 @@ export default function SpaceInfo() {
                 </Flex>
 
                 {/* Hours status */}
-                <Flex
+                {/* <Flex
                     direction="column"
                     align="start"
                     justify="end"
@@ -110,7 +109,7 @@ export default function SpaceInfo() {
                     className="flex flex-grow"
                 >
                     {timeHelper && <HoursDisplay timeHelper={timeHelper} openState={openState} />}
-                </Flex>
+                </Flex> */}
             </Flex>
         </Box>
     );

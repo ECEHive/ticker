@@ -1,10 +1,11 @@
-import ErrorBoundary from "@/components/ErrorBoundary";
 import Config from "@/components/Config";
+import ErrorBoundary from "@/components/ErrorBoundary";
 import { EventsProvider } from "@/contexts/EventsContext";
 import { SpotifyProvider } from "@/contexts/SpotifyContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { TimeProvider } from "@/contexts/TimeContext";
 import useTheme from "@/hooks/useTheme";
+import Designer from "@/pages/Designer";
 import FrontDesk from "@/pages/FrontDesk";
 import Ticker from "@/pages/Ticker";
 import { Box, Flex, Theme } from "@radix-ui/themes";
@@ -39,6 +40,7 @@ function AppShell() {
                                 <Routes>
                                     <Route index element={<Ticker />} />
                                     <Route path="frontdesk" element={<FrontDesk />} />
+                                    <Route path="designer" element={<Designer />} />
                                 </Routes>
                             </Flex>
                         </Box>
