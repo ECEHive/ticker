@@ -3,6 +3,7 @@ import Calendar from "@/components/bigscreen/Calendar";
 import Hero from "@/components/bigscreen/Hero";
 import Printers from "@/components/bigscreen/Printers";
 import QRCodes from "@/components/bigscreen/QRCodes";
+import SlideTemplate from "@/components/bigscreen/SlideTemplate";
 import Workshops from "@/components/bigscreen/Workshops";
 import useWebhook from "@/hooks/useWebhook";
 import { BigScreenSpecialSlide, BigSlide, RawBigSlide } from "@/types";
@@ -60,12 +61,16 @@ export default function BigScreen() {
             )
         } else if (slides[slideIndex]?.image) {
             console.log(slides[slideIndex].image)
-            return <img src={slides[slideIndex].image[0].thumbnails.full.url} alt={slides[slideIndex].title} style={{ width: "100%", height: "100%", objectFit: "cover" }} />;
+            return (
+                <SlideTemplate fullscreen timeout={10000} callback={incrementSlide}>
+                    <img src={slides[slideIndex].image[0].thumbnails.full.url} alt={slides[slideIndex].title} style={{ width: "100%", height: "100%", objectFit: "cover" }} />;
+                </SlideTemplate>
+            )
         }
         else {
             return <div style={{ width: "100%", height: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}>No slide available</div>;
         }
-    }, [slides, slideIndex]);
+    }, [slides, slideIndex, incrementSlide]);
 
     return (
         <Flex
