@@ -182,6 +182,23 @@ export interface Slide {
     enabled: boolean;
 }
 
+// ─── Big Slides ─────────────────────────────────────────────────────
+
+export interface RawBigSlide {
+    Title: string;
+    SpecialID: string;
+    Image: string;
+    Enabled: boolean;
+}
+
+export interface BigSlide {
+    title: string;
+    specialId: string;
+    image: any;
+    component: ReactNode | null;
+    enabled: boolean;
+}
+
 // ─── Printers ──────────────────────────────────────────────────────
 
 export interface PrinterGroup {
@@ -198,10 +215,9 @@ export interface PrinterQueueData {
     printers: PrinterGroup[];
 }
 
-// ─── FrontDesk Slides ──────────────────────────────────────────────
+// ─── BigScreen Slides ──────────────────────────────────────────────
 
-export interface FrontDeskSlide {
+export interface BigScreenSpecialSlide {
     component: ReactNode;
-    skipIfClosed: boolean;
-    skip?: boolean;
+    id: string;
 }

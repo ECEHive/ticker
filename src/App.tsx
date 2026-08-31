@@ -5,8 +5,8 @@ import { SpotifyProvider } from "@/contexts/SpotifyContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { TimeProvider } from "@/contexts/TimeContext";
 import useTheme from "@/hooks/useTheme";
+import BigScreen from "@/pages/BigScreen";
 import Designer from "@/pages/Designer";
-import FrontDesk from "@/pages/FrontDesk";
 import Ticker from "@/pages/Ticker";
 import { Box, Flex, Theme } from "@radix-ui/themes";
 import { Route, Routes } from "react-router";
@@ -39,7 +39,7 @@ function AppShell() {
                             >
                                 <Routes>
                                     <Route index element={<Ticker />} />
-                                    <Route path="frontdesk" element={<FrontDesk />} />
+                                    <Route path="bigscreen" element={<BigScreen />} />
                                     <Route path="designer" element={<Designer />} />
                                 </Routes>
                             </Flex>
