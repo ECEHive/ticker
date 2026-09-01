@@ -12,11 +12,20 @@ interface SpotifyProviderProps {
 }
 
 export function SpotifyProvider({ children }: SpotifyProviderProps) {
-    const [accessToken, setAccessToken] = useState<string | null>(() => getStorageItem("access_token", null));
-    const [refreshTokenStr, setRefreshToken] = useState<string | null>(() => getStorageItem("refresh_token", null));
+    const [accessToken, setAccessToken] = useState<string | null>(() => {
+        const token = getStorageItem<string | null>("access_token", null);
+        return typeof token === "string" ? token.trim() : null;
+    });
+    const [refreshTokenStr, setRefreshToken] = useState<string | null>(() => {
+        const token = getStorageItem<string | null>("refresh_token", null);
+        return typeof token === "string" ? token.trim() : null;
+    });
     const [expiresIn, setExpiresIn] = useState<number | null>(() => getStorageItem("expires_in", null));
     const [expires, setExpires] = useState<string | null>(() => getStorageItem("expires", null));
-    const [codeVerifier, setCodeVerifier] = useState<string | null>(() => getStorageItem("code_verifier", null));
+    const [codeVerifier, setCodeVerifier] = useState<string | null>(() => {
+        const verifier = getStorageItem<string | null>("code_verifier", null);
+        return typeof verifier === "string" ? verifier.trim() : null;
+    });
 
     const [playerState, setPlayerState] = useState<SpotifyPlayerState | null>(null);
     const [spotifyEnabled, setSpotifyEnabled] = useState<boolean>(() => getStorageItem("spotify-enabled", true));
@@ -26,11 +35,15 @@ export function SpotifyProvider({ children }: SpotifyProviderProps) {
     const updateToken = useCallback((response: SpotifyTokenResponse) => {
         if (response.error) return;
 
-        setAccessToken(response.access_token);
-        setStorageItem("access_token", response.access_token);
+        // Trim tokens to remove any whitespace that could cause parsing issues
+        const accessToken = response.access_token.trim();
+        const refreshToken = response.refresh_token.trim();
 
-        setRefreshToken(response.refresh_token);
-        setStorageItem("refresh_token", response.refresh_token);
+        setAccessToken(accessToken);
+        setStorageItem("access_token", accessToken);
+
+        setRefreshToken(refreshToken);
+        setStorageItem("refresh_token", refreshToken);
 
         setExpiresIn(response.expires_in);
         setStorageItem("expires_in", response.expires_in);
@@ -59,11 +72,17 @@ export function SpotifyProvider({ children }: SpotifyProviderProps) {
                 if (!isRefreshing.current && refreshTokenStr) {
                     isRefreshing.current = true;
                     const token = await refreshSpotifyToken(refreshTokenStr);
-                    if (token && !token.error) {
+                    if (token && !token.error && 'access_token' in token) {
+                        const newAccessToken = token.access_token.trim();
                         updateToken(token);
+                        // Retry the request with the new token after refresh
+                        isRefreshing.current = false;
+                        return fetchSpotifyApi(endpoint, newAccessToken);
                     }
                     isRefreshing.current = false;
                 }
+                // If already refreshing or refresh failed, wait a moment and retry
+                await new Promise((resolve) => setTimeout(resolve, 100));
                 return null;
             }
 
