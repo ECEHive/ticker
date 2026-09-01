@@ -35,7 +35,6 @@ export default function BigScreen() {
             // if specialID matches a special slide, use that component instead of the content
             .map((s) => {
                 const specialSlide = SPECIAL_SLIDES.find((ss) => ss.id === s.SpecialID);
-                console.log(`Slide ${s.Title} (${s.SpecialID}) is ${s.Enabled ? "enabled" : "disabled"}${specialSlide ? ` and is a special slide` : ""}`);
                 return {
                     title: s.Title,
                     specialId: s.SpecialID,
@@ -56,14 +55,16 @@ export default function BigScreen() {
         if (slides[slideIndex]?.component) {
             return (
                 <Box p="7" width="100%" height="100%">
-                    {slides[slideIndex].component}
+                    {cloneElement(slides[slideIndex].component as React.ReactElement<{ callback?: () => void }>, {
+                        callback: incrementSlide,
+                    })}
                 </Box>
-            )
+            );
         } else if (slides[slideIndex]?.image) {
             console.log(slides[slideIndex].image)
             return (
                 <SlideTemplate fullscreen timeout={10000} callback={incrementSlide}>
-                    <img src={slides[slideIndex].image[0].thumbnails.full.url} alt={slides[slideIndex].title} style={{ width: "100%", height: "100%", objectFit: "cover" }} />;
+                    <img src={slides[slideIndex].image[0].thumbnails.full.url} alt={slides[slideIndex].title} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                 </SlideTemplate>
             )
         }
@@ -96,9 +97,7 @@ export default function BigScreen() {
                 >
                     <ErrorBoundary>
                         {isValidElement(currentSlide)
-                            ? cloneElement(currentSlide as React.ReactElement<{ callback?: () => void }>, {
-                                callback: incrementSlide,
-                            })
+                            ? currentSlide
                             : null}
                     </ErrorBoundary>
                 </motion.div>
