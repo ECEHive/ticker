@@ -120,7 +120,7 @@ export default function Slides({ slidesOverride }: { slidesOverride?: Slide[] })
                         style={{ height: "100%", width: "100%", padding: "40px", overflow: "hidden" }}
                     >
                         <Markdown
-                            className={`h-full prose prose-2xl prose-neutral ${colorTheme === "dark" ? "prose-invert" : ""} overflow-hidden`}
+                            className={`prose prose-2xl prose-neutral ${colorTheme === "dark" ? "prose-invert" : ""} overflow-hidden`}
                             remarkPlugins={[remarkGfm]}
                             rehypePlugins={[rehypeRaw]}
                         >
