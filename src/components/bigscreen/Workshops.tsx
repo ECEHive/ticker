@@ -52,7 +52,7 @@ export default function Workshops({ callback }: WorkshopsProps) {
     return (
         <SlideTemplate title="Workshop Spotlight">
             {workshopCalendar.length > 0 ? (
-                <Box className="flex h-full w-full flex-col gap-8 overflow-auto" id="container">
+                <Box className="flex h-full w-full flex-col gap-8 overflow-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]" id="container">
                     {workshopCalendar.map((event, i) => {
                         const previewUrl = event["Preview - Ticker"]?.[0]?.url;
                         return (
