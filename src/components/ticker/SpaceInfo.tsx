@@ -49,7 +49,7 @@ function HoursDisplay({
 }
 
 export default function SpaceInfo() {
-    const { time, openState, date, timeHelper, DIGIT_MAP } = useTime();
+    const { time, date, DIGIT_MAP } = useTime();
 
     const dateLines = useMemo(() => date.split(" "), [date]);
 

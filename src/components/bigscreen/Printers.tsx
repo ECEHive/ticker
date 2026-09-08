@@ -1,13 +1,12 @@
+import bambuLogo from "@/assets/printing/bambu.svg";
+import formlabsLogo from "@/assets/printing/formlabs.svg";
 import useWebhook from "@/hooks/useWebhook";
 import type { PrinterGroup, PrinterQueueData } from "@/types";
 import { Flex, Grid, Spinner } from "@radix-ui/themes";
 import { motion } from "motion/react";
-import QRCode from "react-qr-code";
-import { FaCubes, FaRegFaceFrown, FaRegFaceMeh, FaRegFaceSmile } from "react-icons/fa6";
-import bambuLogo from "@/assets/printing/bambu.svg";
-import formlabsLogo from "@/assets/printing/formlabs.svg";
-import SlideTemplate from "./SlideTemplate";
 import { useCallback } from "react";
+import { FaCubes, FaRegFaceFrown, FaRegFaceMeh, FaRegFaceSmile } from "react-icons/fa6";
+import SlideTemplate from "./SlideTemplate";
 
 interface PrintersProps {
     callback?: () => void;
@@ -120,26 +119,7 @@ export default function Printers({ callback }: PrintersProps) {
                         <PrinterCard key={index} printer={printer} />
                     ))}
 
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        className="flex flex-row items-start justify-start gap-5 p-5"
-                    >
-                        <Flex direction="row" justify="start" align="start" gap="4" width="100%" height="100%">
-                            <p className="h-full w-min text-3xl font-medium">
-                                Check your Bambu print&apos;s status at hive.pluraprint.com
-                            </p>
-                            <div className="flex flex-grow flex-row items-start justify-end">
-                                <QRCode
-                                    value="https://hive.pluraprint.com"
-                                    size={175}
-                                    bgColor="transparent"
-                                    fgColor="white"
-                                    className="h-full"
-                                />
-                            </div>
-                        </Flex>
-                    </motion.div>
+
                 </Grid>
             ) : (
                 <Flex
