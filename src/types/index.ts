@@ -86,6 +86,7 @@ export interface TimeContextValue {
     alertActive: boolean;
     alertContent: AlertContent | null;
     timeHelper: TimeHelperTuple;
+    DIGIT_MAP: Array<(t: string) => string>;
 }
 
 // ─── Events & Workshops ────────────────────────────────────────────

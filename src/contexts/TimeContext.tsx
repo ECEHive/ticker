@@ -22,6 +22,8 @@ interface TimeProviderProps {
     children: ReactNode;
 }
 
+
+
 const ALERT_TEMPLATES: Record<AlertType, (time: dayjs.Dayjs) => AlertContent> = {
     hourly: (time) => ({
         title: `The time is ${time.format("hA")}`,
@@ -70,6 +72,14 @@ export function TimeProvider({ children }: TimeProviderProps) {
     const [alertContent, setAlertContent] = useState<AlertContent | null>(null);
 
     const [hours, setHours] = useState<HoursState>({ openToday: false, hours: [] });
+
+    const DIGIT_MAP = [
+        (t: string) => (t[0] !== "0" ? t[0] : ""),
+        (t: string) => t[1],
+        () => ":",
+        (t: string) => t[3],
+        (t: string) => t[4],
+    ];
 
     // Fetch open hours on mount
     useEffect(() => {
@@ -228,7 +238,7 @@ export function TimeProvider({ children }: TimeProviderProps) {
     }, [timeRaw, openState, alertSchedule]);
 
     return (
-        <TimeContext.Provider value={{ time, date, openState, hours, alertActive, alertContent, timeHelper }}>
+        <TimeContext.Provider value={{ time, date, openState, hours, alertActive, alertContent, timeHelper, DIGIT_MAP }}>
             {children}
         </TimeContext.Provider>
     );

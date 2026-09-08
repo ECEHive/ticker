@@ -7,7 +7,7 @@ interface CalendarProps {
     callback?: () => void;
 }
 
-const CALENDAR_DAYS = 21;
+const CALENDAR_DAYS = 14;
 
 export default function Calendar({ callback }: CalendarProps) {
     const { events } = useEvents();

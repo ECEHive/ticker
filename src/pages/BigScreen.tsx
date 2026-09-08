@@ -1,5 +1,6 @@
 import ErrorBoundary from "@/components/ErrorBoundary";
 import Calendar from "@/components/bigscreen/Calendar";
+import Footer from "@/components/bigscreen/Footer";
 import Hero from "@/components/bigscreen/Hero";
 import Printers from "@/components/bigscreen/Printers";
 import QRCodes from "@/components/bigscreen/QRCodes";
@@ -74,34 +75,39 @@ export default function BigScreen() {
     }, [slides, slideIndex, incrementSlide]);
 
     return (
-        <Flex
-            direction="column"
-            height="100%"
-            minHeight="100%"
-            width="100%"
-            minWidth="100%"
-            position="relative"
-            justify="start"
-            align="start"
-            gap="6"
-            onClick={incrementSlide}
-        >
-            <AnimatePresence mode="wait">
-                <motion.div
-                    key={slideIndex}
-                    initial={{ x: 10, opacity: 0 }}
-                    animate={{ x: 0, opacity: 1 }}
-                    exit={{ x: -10, opacity: 0 }}
-                    transition={{ duration: 0.2 }}
-                    className="h-full max-h-full w-full max-w-full"
-                >
-                    <ErrorBoundary>
-                        {isValidElement(currentSlide)
-                            ? currentSlide
-                            : null}
-                    </ErrorBoundary>
-                </motion.div>
-            </AnimatePresence>
+        <Flex direction="column" height="100vh" width="100%" minWidth="100%" position="relative" overflow="hidden">
+            <Flex
+                direction="column"
+                flexGrow="1"
+                width="100%"
+                minWidth="100%"
+                position="relative"
+                justify="start"
+                align="start"
+                gap="6"
+                onClick={incrementSlide}
+                className="overflow-hidden"
+            >
+                <AnimatePresence mode="wait">
+                    <motion.div
+                        key={slideIndex}
+                        initial={{ x: 10, opacity: 0 }}
+                        animate={{ x: 0, opacity: 1 }}
+                        exit={{ x: -10, opacity: 0 }}
+                        transition={{ duration: 0.2 }}
+                        className="h-full max-h-full w-full max-w-full"
+                    >
+                        <ErrorBoundary>
+                            {isValidElement(currentSlide)
+                                ? currentSlide
+                                : null}
+                        </ErrorBoundary>
+                    </motion.div>
+                </AnimatePresence>
+            </Flex>
+            <Box minHeight="100px" maxHeight="100px" className="w-full relative border-t-[2px] border-solid border-[--sand-7] p-6 gap-6">
+                <Footer />
+            </Box>
         </Flex>
     );
 }

@@ -5,13 +5,7 @@ import { Box, Flex, Text } from "@radix-ui/themes";
 import { AnimatePresence, motion } from "framer-motion";
 import { useMemo } from "react";
 
-const DIGIT_MAP = [
-    (t: string) => (t[0] !== "0" ? t[0] : ""),
-    (t: string) => t[1],
-    () => ":",
-    (t: string) => t[3],
-    (t: string) => t[4],
-];
+
 
 function HoursDisplay({
     timeHelper,
@@ -55,7 +49,7 @@ function HoursDisplay({
 }
 
 export default function SpaceInfo() {
-    const { time, openState, date, timeHelper } = useTime();
+    const { time, openState, date, timeHelper, DIGIT_MAP } = useTime();
 
     const dateLines = useMemo(() => date.split(" "), [date]);
 
@@ -85,7 +79,7 @@ export default function SpaceInfo() {
                                 </motion.div>
                             </AnimatePresence>
                         ))}
-                        {/* <Text className="mb-4 self-end font-mono text-5xl font-medium">{time[1]}</Text> */}
+                        <Text className="mb-4 self-end font-mono text-5xl font-medium">{time[1]}</Text>
                     </Flex>
 
                     <Flex direction="column" align="start" justify="start" gap="0" height="auto" width="100%">
