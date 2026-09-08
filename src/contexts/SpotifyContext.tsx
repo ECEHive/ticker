@@ -1,165 +1,173 @@
-import { buildSpotifyAuthUrl, exchangeSpotifyCode, fetchSpotifyApi, refreshSpotifyToken } from "@/api/spotify";
-import type { SpotifyContextValue, SpotifyPlayerState, SpotifyToken, SpotifyTokenResponse } from "@/types";
-import { generateCodeChallenge, generateRandomString } from "@/utils/crypto";
+import {
+    exchangeCodeForToken,
+    redirectToSpotifyAuthorize as redirectToSpotify,
+    refreshAccessToken,
+    SPOTIFY_CODE_VERIFIER_KEY,
+    spotifyRequest
+} from "@/api/spotify";
+import type { SpotifyContextValue, SpotifyPlayerState, SpotifyToken } from "@/types";
 import { getStorageItem, removeStorageItem, setStorageItem } from "@/utils/storage";
-import { dayjs } from "@/utils/time";
-import { createContext, type ReactNode, useCallback, useEffect, useRef, useState } from "react";
+import React, { createContext, useCallback, useEffect, useState } from "react";
 
 export const SpotifyContext = createContext<SpotifyContextValue | null>(null);
 
-interface SpotifyProviderProps {
-    children: ReactNode;
-}
+const TOKEN_STORAGE_KEY = "spotify_token";
+const ENABLED_STORAGE_KEY = "spotify_enabled";
 
-export function SpotifyProvider({ children }: SpotifyProviderProps) {
-    const [accessToken, setAccessToken] = useState<string | null>(() => {
-        const token = getStorageItem<string | null>("access_token", null);
-        return typeof token === "string" ? token.trim() : null;
+export const SpotifyProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+    const [currentToken, setCurrentToken] = useState<SpotifyToken>(() => {
+        return getStorageItem<SpotifyToken>(TOKEN_STORAGE_KEY, {
+            access_token: null,
+            refresh_token: null,
+            expires_in: null,
+            expires: null,
+        });
     });
-    const [refreshTokenStr, setRefreshToken] = useState<string | null>(() => {
-        const token = getStorageItem<string | null>("refresh_token", null);
-        return typeof token === "string" ? token.trim() : null;
-    });
-    const [expiresIn, setExpiresIn] = useState<number | null>(() => getStorageItem("expires_in", null));
-    const [expires, setExpires] = useState<string | null>(() => getStorageItem("expires", null));
-    const [codeVerifier, setCodeVerifier] = useState<string | null>(() => {
-        const verifier = getStorageItem<string | null>("code_verifier", null);
-        return typeof verifier === "string" ? verifier.trim() : null;
+
+    const [spotifyEnabled, setSpotifyEnabledState] = useState<boolean>(() => {
+        return getStorageItem<boolean>(ENABLED_STORAGE_KEY, false);
     });
 
     const [playerState, setPlayerState] = useState<SpotifyPlayerState | null>(null);
-    const [spotifyEnabled, setSpotifyEnabled] = useState<boolean>(() => getStorageItem("spotify-enabled", true));
 
-    const isRefreshing = useRef(false);
-
-    const updateToken = useCallback((response: SpotifyTokenResponse) => {
-        if (response.error) return;
-
-        // Trim tokens to remove any whitespace that could cause parsing issues
-        const accessToken = response.access_token.trim();
-        const refreshToken = response.refresh_token.trim();
-
-        setAccessToken(accessToken);
-        setStorageItem("access_token", accessToken);
-
-        setRefreshToken(refreshToken);
-        setStorageItem("refresh_token", refreshToken);
-
-        setExpiresIn(response.expires_in);
-        setStorageItem("expires_in", response.expires_in);
-
-        const expiry = new Date(Date.now() + response.expires_in * 1000).toISOString();
-        setExpires(expiry);
-        setStorageItem("expires", expiry);
+    const setSpotifyEnabled = useCallback((value: boolean) => {
+        setSpotifyEnabledState(value);
+        setStorageItem(ENABLED_STORAGE_KEY, value);
     }, []);
 
-    const redirectToSpotifyAuthorize = useCallback(() => {
-        const verifier = generateRandomString(64);
-        setCodeVerifier(verifier);
-        setStorageItem("code_verifier", verifier);
-
-        generateCodeChallenge(verifier).then((challenge) => {
-            window.location.href = buildSpotifyAuthUrl(challenge);
+    const updateToken = useCallback((tokenData: Partial<SpotifyToken>) => {
+        setCurrentToken(prev => {
+            const next = { ...prev, ...tokenData };
+            setStorageItem(TOKEN_STORAGE_KEY, next);
+            return next;
         });
     }, []);
 
-    const request = useCallback(
-        async (endpoint: string): Promise<unknown> => {
-            if (!accessToken) return null;
-
-            // Refresh if expired
-            if (expires && dayjs().isAfter(dayjs(expires))) {
-                if (!isRefreshing.current && refreshTokenStr) {
-                    isRefreshing.current = true;
-                    const token = await refreshSpotifyToken(refreshTokenStr);
-                    if (token && !token.error && 'access_token' in token) {
-                        const newAccessToken = token.access_token.trim();
-                        updateToken(token);
-                        // Retry the request with the new token after refresh
-                        isRefreshing.current = false;
-                        return fetchSpotifyApi(endpoint, newAccessToken);
-                    }
-                    isRefreshing.current = false;
-                }
-                // If already refreshing or refresh failed, wait a moment and retry
-                await new Promise((resolve) => setTimeout(resolve, 100));
-                return null;
-            }
-
-            return fetchSpotifyApi(endpoint, accessToken);
-        },
-        [accessToken, expires, refreshTokenStr, updateToken],
-    );
-
     const logOut = useCallback(() => {
-        setAccessToken(null);
-        setRefreshToken(null);
-        setExpiresIn(null);
-        setExpires(null);
-        removeStorageItem("access_token");
-        removeStorageItem("refresh_token");
-        removeStorageItem("expires_in");
-        removeStorageItem("expires");
-    }, []);
+        updateToken({
+            access_token: null,
+            refresh_token: null,
+            expires_in: null,
+            expires: null,
+        });
+        setPlayerState(null);
+        setSpotifyEnabled(false);
+        window.localStorage.removeItem(SPOTIFY_CODE_VERIFIER_KEY);
+        removeStorageItem(TOKEN_STORAGE_KEY);
+    }, [updateToken, setSpotifyEnabled]);
 
-    const handleSpotifyEnabled = useCallback((value: boolean) => {
-        setSpotifyEnabled(value);
-        setStorageItem("spotify-enabled", value);
-    }, []);
-
-    // Handle OAuth callback on page load
+    // Initial check for OAuth code in URL
     useEffect(() => {
-        const args = new URLSearchParams(window.location.search);
-        const code = args.get("code");
+        const urlParams = new URLSearchParams(window.location.search);
+        const code = urlParams.get("code");
 
-        if (code && codeVerifier) {
-            exchangeSpotifyCode(code, codeVerifier).then((token) => {
-                if (token && !token.error) {
-                    updateToken(token);
-                }
-                // Clean URL
-                const url = new URL(window.location.href);
-                url.searchParams.delete("code");
-                const updatedUrl = url.search ? url.href : url.href.replace("?", "");
-                window.history.replaceState({}, document.title, updatedUrl);
-            });
+        if (code) {
+            const verifier = window.localStorage.getItem(SPOTIFY_CODE_VERIFIER_KEY);
+            if (verifier) {
+                // Clear the URL to avoid re-triggering and clean up the address bar
+                window.history.replaceState({}, document.title, window.location.pathname);
+
+                exchangeCodeForToken(code, verifier)
+                    .then(res => {
+                        updateToken({
+                            access_token: res.access_token,
+                            refresh_token: res.refresh_token,
+                            expires_in: res.expires_in,
+                            expires: new Date(Date.now() + res.expires_in * 1000).toISOString(),
+                        });
+                        setSpotifyEnabled(true);
+                        // Clean up the verifier since we successfully exchanged it
+                        window.localStorage.removeItem(SPOTIFY_CODE_VERIFIER_KEY);
+                    })
+                    .catch(err => {
+                        console.error("Failed to exchange code for token:", err);
+                    });
+            }
         }
-    }, [updateToken, codeVerifier]);
+    }, [updateToken, setSpotifyEnabled]);
 
-    // Poll player state
+    const request = useCallback(async (endpoint: string) => {
+        let token = currentToken;
+
+        // Check if token is expired
+        if (token.expires && new Date(token.expires) <= new Date() && token.refresh_token) {
+            try {
+                const res = await refreshAccessToken(token.refresh_token);
+                token = {
+                    access_token: res.access_token,
+                    // The refresh token might not be returned in every refresh response
+                    refresh_token: res.refresh_token || token.refresh_token,
+                    expires_in: res.expires_in,
+                    expires: new Date(Date.now() + res.expires_in * 1000).toISOString(),
+                };
+                updateToken(token);
+            } catch (error) {
+                console.error("Failed to refresh token:", error);
+                logOut();
+                throw error;
+            }
+        }
+
+        if (!token.access_token) {
+            throw new Error("No access token available");
+        }
+
+        return spotifyRequest(endpoint, token.access_token);
+    }, [currentToken, logOut, updateToken]);
+
+    // Poll player state periodically if enabled and authenticated
     useEffect(() => {
-        if (!accessToken) return;
+        if (!spotifyEnabled || !currentToken.access_token) {
+            setPlayerState(null);
+            return;
+        }
 
+        let isMounted = true;
         const fetchPlayer = async () => {
-            const state = (await request("me/player")) as SpotifyPlayerState | null;
-            if (state) setPlayerState(state);
+            try {
+                const state = await request("/me/player") as SpotifyPlayerState | null;
+                // If it returned 204 or empty object, state might be empty
+                if (isMounted) {
+                    if (state && Object.keys(state).length > 0) {
+                        setPlayerState(state);
+                    } else {
+                        setPlayerState(null);
+                    }
+                }
+            } catch (err) {
+                console.error("Failed to fetch player state:", err);
+            }
         };
 
         fetchPlayer();
-        const interval = setInterval(fetchPlayer, 5000);
-        return () => clearInterval(interval);
-    }, [accessToken, request]);
+        const interval = setInterval(fetchPlayer, 10000); // Poll every 10s
 
-    const currentToken: SpotifyToken = {
-        access_token: accessToken,
-        refresh_token: refreshTokenStr,
-        expires_in: expiresIn,
-        expires,
+        return () => {
+            isMounted = false;
+            clearInterval(interval);
+        };
+    }, [spotifyEnabled, currentToken.access_token, request]);
+
+    const redirectToSpotifyAuthorizeWrapper = useCallback(() => {
+        redirectToSpotify().catch(err => {
+            console.error("Failed to redirect to Spotify:", err);
+        });
+    }, []);
+
+    const value: SpotifyContextValue = {
+        currentToken,
+        redirectToSpotifyAuthorize: redirectToSpotifyAuthorizeWrapper,
+        request,
+        logOut,
+        playerState,
+        spotifyEnabled,
+        setSpotifyEnabled,
     };
 
     return (
-        <SpotifyContext.Provider
-            value={{
-                currentToken,
-                redirectToSpotifyAuthorize,
-                request,
-                logOut,
-                playerState,
-                spotifyEnabled,
-                setSpotifyEnabled: handleSpotifyEnabled,
-            }}
-        >
+        <SpotifyContext.Provider value={value}>
             {children}
         </SpotifyContext.Provider>
     );
-}
+};
+

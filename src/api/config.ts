@@ -1,7 +1,9 @@
 import type { ApiConfig } from "@/types";
 
 const redirectUrl =
-    window.location.hostname === "127.0.0.1" ? "http://127.0.0.1:5173" : "https://ticker.hivemakerspace.com/";
+    window.location.hostname === "127.0.0.1" || window.location.hostname === "localhost"
+        ? "http://127.0.0.1:5173"
+        : "https://ticker.hivemakerspace.com/";
 
 export const API_CONFIG: ApiConfig = {
     webhookBase: "https://n8n.hivemakerspace.com/webhook",

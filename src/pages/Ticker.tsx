@@ -12,7 +12,7 @@ export default function Ticker() {
     return (
         <>
             <Flex direction="row" height="100%" minHeight="0px" width="100%" position="relative">
-                <Box width="auto" height="100%" className="border-r-[3px] border-solid border-[--sand-7]">
+                <Box width="auto" height="100%" className="border-r-[2px] border-solid border-[--sand-7]">
                     <ErrorBoundary>
                         <SpaceInfo />
                     </ErrorBoundary>
@@ -21,7 +21,7 @@ export default function Ticker() {
                     <ErrorBoundary>{alertActive ? <MainAlert /> : <Slides />}</ErrorBoundary>
                 </Box>
             </Flex>
-            <Box height="auto" width="100%" className="border-t-[3px] border-solid border-[--sand-7]">
+            <Box height="auto" width="100%" className="border-t-[2px] border-solid border-[--sand-7]">
                 <ErrorBoundary>
                     <Footer />
                 </ErrorBoundary>

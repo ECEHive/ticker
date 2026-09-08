@@ -1,48 +1,104 @@
 import type { SpotifyTokenResponse } from "@/types";
-import { safeFetch } from "./client";
+import { generateCodeChallenge, generateRandomString } from "@/utils/crypto";
 import { API_CONFIG, SPOTIFY_REDIRECT_URL } from "./config";
 
-export async function exchangeSpotifyCode(code: string, codeVerifier: string): Promise<SpotifyTokenResponse | null> {
-    return safeFetch<SpotifyTokenResponse>(API_CONFIG.spotifyTokenEndpoint, {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: new URLSearchParams({
-            client_id: API_CONFIG.spotifyClientId,
-            grant_type: "authorization_code",
-            code,
-            redirect_uri: SPOTIFY_REDIRECT_URL,
-            code_verifier: codeVerifier,
-        }),
-    });
-}
+export const SPOTIFY_CODE_VERIFIER_KEY = "spotify_code_verifier";
 
-export async function refreshSpotifyToken(refreshToken: string): Promise<SpotifyTokenResponse | null> {
-    return safeFetch<SpotifyTokenResponse>(API_CONFIG.spotifyTokenEndpoint, {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: new URLSearchParams({
-            client_id: API_CONFIG.spotifyClientId,
-            grant_type: "refresh_token",
-            refresh_token: refreshToken,
-        }),
-    });
-}
+/**
+ * Initiates the PKCE flow by generating a code verifier and challenge,
+ * then redirecting the user to the Spotify authorization endpoint.
+ */
+export async function redirectToSpotifyAuthorize(): Promise<void> {
+    const verifier = generateRandomString(128);
+    window.localStorage.setItem(SPOTIFY_CODE_VERIFIER_KEY, verifier);
 
-export async function fetchSpotifyApi<T>(endpoint: string, accessToken: string): Promise<T | null> {
-    return safeFetch<T>(`${API_CONFIG.spotifyApiBase}/${endpoint}`, {
-        headers: { Authorization: `Bearer ${accessToken}` },
-    });
-}
+    const challenge = await generateCodeChallenge(verifier);
 
-export function buildSpotifyAuthUrl(codeChallenge: string): string {
-    const authUrl = new URL(API_CONFIG.spotifyAuthEndpoint);
-    authUrl.search = new URLSearchParams({
-        response_type: "code",
+    const params = new URLSearchParams({
         client_id: API_CONFIG.spotifyClientId,
-        scope: API_CONFIG.spotifyScope,
-        code_challenge_method: "S256",
-        code_challenge: codeChallenge,
+        response_type: "code",
         redirect_uri: SPOTIFY_REDIRECT_URL,
-    }).toString();
-    return authUrl.toString();
+        code_challenge_method: "S256",
+        code_challenge: challenge,
+        scope: API_CONFIG.spotifyScope,
+    });
+
+    window.location.href = `${API_CONFIG.spotifyAuthEndpoint}?${params.toString()}`;
+}
+
+/**
+ * Exchanges an authorization code for an access token.
+ */
+export async function exchangeCodeForToken(code: string, verifier: string): Promise<SpotifyTokenResponse> {
+    const params = new URLSearchParams({
+        client_id: API_CONFIG.spotifyClientId,
+        grant_type: "authorization_code",
+        code,
+        redirect_uri: SPOTIFY_REDIRECT_URL,
+        code_verifier: verifier,
+    });
+
+    const res = await fetch(API_CONFIG.spotifyTokenEndpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: params.toString(),
+    });
+
+    if (!res.ok) {
+        throw new Error(`Failed to exchange token: ${res.status} ${res.statusText}`);
+    }
+
+    return res.json() as Promise<SpotifyTokenResponse>;
+}
+
+/**
+ * Refreshes an expired access token using the refresh token.
+ */
+export async function refreshAccessToken(refreshToken: string): Promise<SpotifyTokenResponse> {
+    const params = new URLSearchParams({
+        client_id: API_CONFIG.spotifyClientId,
+        grant_type: "refresh_token",
+        refresh_token: refreshToken,
+    });
+
+    const res = await fetch(API_CONFIG.spotifyTokenEndpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: params.toString(),
+    });
+
+    if (!res.ok) {
+        throw new Error(`Failed to refresh token: ${res.status} ${res.statusText}`);
+    }
+
+    return res.json() as Promise<SpotifyTokenResponse>;
+}
+
+/**
+ * Makes an authenticated request to the Spotify API.
+ */
+export async function spotifyRequest<T>(endpoint: string, accessToken: string): Promise<T> {
+    const url = endpoint.startsWith("http")
+        ? endpoint
+        : `${API_CONFIG.spotifyApiBase}${endpoint.startsWith("/") ? endpoint : `/${endpoint}`}`;
+
+    const res = await fetch(url, {
+        headers: {
+            Authorization: `Bearer ${accessToken}`,
+        },
+    });
+
+    if (!res.ok) {
+        throw new Error(`Spotify API request failed: ${res.status} ${res.statusText}`);
+    }
+
+    // Handle 204 No Content which some Spotify endpoints return
+    if (res.status === 204) {
+        return {} as T;
+    }
+
+    const text = await res.text();
+    if (!text) return {} as T;
+
+    return JSON.parse(text) as T;
 }

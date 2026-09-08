@@ -76,8 +76,8 @@ export default function SpaceInfo() {
                                 >
                                     <p
                                         className={`${getDigit(time[0]) !== ":"
-                                                ? "font-mono text-[9.8rem] font-semibold"
-                                                : "font-sans text-[9.8rem] font-medium"
+                                            ? "font-mono text-[9.8rem] font-semibold"
+                                            : "font-sans text-[9.8rem] font-medium"
                                             } leading-none`}
                                     >
                                         {getDigit(time[0])}
@@ -85,7 +85,7 @@ export default function SpaceInfo() {
                                 </motion.div>
                             </AnimatePresence>
                         ))}
-                        <Text className="mb-4 self-end font-mono text-5xl font-medium">{time[1]}</Text>
+                        {/* <Text className="mb-4 self-end font-mono text-5xl font-medium">{time[1]}</Text> */}
                     </Flex>
 
                     <Flex direction="column" align="start" justify="start" gap="0" height="auto" width="100%">
