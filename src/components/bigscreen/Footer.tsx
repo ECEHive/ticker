@@ -38,12 +38,12 @@ export default function Footer({ }) {
 
 
                 <Flex flexGrow="2" justify="center" align="center" height="100%" overflow="hidden" px='5' minWidth="0">
-                    <SpotifyCurrentlyPlaying titleSize={"text-[2.5rem]"} artistSize={"text-[2.5rem]"} icon={false} dotSize="15px" />
+                    <SpotifyCurrentlyPlaying titleSize={"text-[2.5rem]"} artistSize={"text-[2.5rem]"} dotSize="20px" iconSize={30} />
                 </Flex>
             </Flex>
 
             <Flex direction="row" justify="center" align="center" height="100%" minWidth="175px" ml="6" p="5">
-                <img src={logo} style={{ width: "auto", height: "90%" }} alt="The Hive" />
+                <img src={logo} style={{ width: "auto", height: "80%" }} alt="The Hive" />
             </Flex>
         </Flex >
     )

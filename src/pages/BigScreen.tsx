@@ -1,3 +1,4 @@
+import ErrorBoundary from "@/components/ErrorBoundary";
 import Calendar from "@/components/bigscreen/Calendar";
 import Footer from "@/components/bigscreen/Footer";
 import Hero from "@/components/bigscreen/Hero";
@@ -9,7 +10,7 @@ import useWebhook from "@/hooks/useWebhook";
 import { BigScreenSpecialSlide, BigSlide, RawBigSlide } from "@/types";
 import { Box, Flex } from "@radix-ui/themes";
 import { AnimatePresence, motion } from "motion/react";
-import { cloneElement, useCallback, useMemo, useState } from "react";
+import { cloneElement, isValidElement, useCallback, useMemo, useState } from "react";
 
 const SPECIAL_SLIDES: BigScreenSpecialSlide[] = [
     { component: <Hero key="hero" />, id: "HERO" },
@@ -96,14 +97,11 @@ export default function BigScreen() {
                         transition={{ duration: 0.2 }}
                         className="h-full max-h-full w-full max-w-full"
                     >
-                        {/* <ErrorBoundary>
+                        <ErrorBoundary>
                             {isValidElement(currentSlide)
                                 ? currentSlide
                                 : null}
-                        </ErrorBoundary> */}
-                        <Box p="7" width="100%" height="100%">
-                            <Printers />
-                        </Box>
+                        </ErrorBoundary>
                     </motion.div>
                 </AnimatePresence>
             </Flex>

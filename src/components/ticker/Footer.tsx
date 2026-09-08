@@ -46,7 +46,7 @@ export default function Footer() {
                         justify="start"
                         p="6"
                     >
-                        <SpotifyCurrentlyPlaying />
+                        <SpotifyCurrentlyPlaying iconSize={40} />
                     </Flex>
 
                     <Flex direction="column" justify="center" align="end" width="auto" height="100%" p="6">
