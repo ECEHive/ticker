@@ -38,7 +38,7 @@ export default function Footer({ }) {
 
 
                 <Flex flexGrow="2" justify="center" align="center" height="100%" overflow="hidden" px='5' minWidth="0">
-                    <SpotifyCurrentlyPlaying titleSize={"text-[2.5rem]"} artistSize={"text-[2.5rem]"} dotSize="20px" iconSize={30} />
+                    <SpotifyCurrentlyPlaying titleSize={"text-[2.8rem]"} artistSize={"text-[2.8rem]"} dotSize="20px" iconSize={35} />
                 </Flex>
             </Flex>
 
