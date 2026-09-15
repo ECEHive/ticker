@@ -40,7 +40,7 @@ const ALERT_TEMPLATES: Record<AlertType, (time: dayjs.Dayjs) => AlertContent> = 
         icon: ClockIcon,
         bullets: [
             { icon: TrashIcon, text: "Start cleaning your work area" },
-            { icon: IdCardIcon, text: "Remember to sign out of SUMS when leaving" },
+            { icon: IdCardIcon, text: "Remember to sign out when leaving" },
         ],
     }),
     openingSoon: () => ({
@@ -53,7 +53,7 @@ const ALERT_TEMPLATES: Record<AlertType, (time: dayjs.Dayjs) => AlertContent> = 
         icon: ExitIcon,
         bullets: [
             { icon: TrashIcon, text: "Clean your work area" },
-            { icon: IdCardIcon, text: "Sign out of SUMS when leaving" },
+            { icon: IdCardIcon, text: "Sign out when leaving" },
         ],
     }),
 };
