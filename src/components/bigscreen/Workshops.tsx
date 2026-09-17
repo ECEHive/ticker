@@ -27,30 +27,37 @@ export default function Workshops({ callback }: WorkshopsProps) {
     );
 
     useEffect(() => {
-        if (workshopCalendar.length === 0) return;
-        index.current = 1;
-
-        const scrollInterval = setInterval(() => {
-            if (index.current >= workshopCalendar.length) {
-                clearInterval(scrollInterval);
+        if (workshopCalendar.length === 0) {
+            const timeout = setTimeout(() => {
                 callback?.();
-                return;
-            }
+            }, SCROLL_DELAY);
 
-            scroller.scrollTo(`event-${index.current}`, {
-                duration: 750,
-                delay: 0,
-                smooth: "easeInOutQuart",
-                containerId: "container",
-            });
-            index.current++;
-        }, SCROLL_DELAY);
+            return () => clearTimeout(timeout);
+        } else {
+            index.current = 1;
 
-        return () => clearInterval(scrollInterval);
+            const scrollInterval = setInterval(() => {
+                if (index.current >= workshopCalendar.length) {
+                    clearInterval(scrollInterval);
+                    callback?.();
+                    return;
+                }
+
+                scroller.scrollTo(`event-${index.current}`, {
+                    duration: 750,
+                    delay: 0,
+                    smooth: "easeInOutQuart",
+                    containerId: "container",
+                });
+                index.current++;
+            }, SCROLL_DELAY);
+
+            return () => clearInterval(scrollInterval);
+        }
     }, [callback, workshopCalendar]);
 
     return (
-        <SlideTemplate title="Workshop Spotlight">
+        <SlideTemplate title="Upcoming Workshops & Events">
             {workshopCalendar.length > 0 ? (
                 <Box className="flex h-full w-full flex-col gap-8 overflow-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]" id="container">
                     {workshopCalendar.map((event, i) => {

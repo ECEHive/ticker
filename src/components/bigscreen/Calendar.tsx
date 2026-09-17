@@ -13,7 +13,7 @@ export default function Calendar({ callback }: CalendarProps) {
     const { events } = useEvents();
 
     return (
-        <SlideTemplate title="Upcoming Events & Workshops" callback={callback} timeout={20000}>
+        <SlideTemplate title="The Hive Calendar" callback={callback} timeout={20000}>
             <Flex direction="row" justify="start" align="center" gap="4" width="100%" height="100%">
                 <Grid width="100%" gap="4" height="100%" columns="5" rows="auto">
                     {events.length > 0 &&
