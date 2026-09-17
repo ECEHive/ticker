@@ -1,7 +1,7 @@
+import useWebhook from "@/hooks/useWebhook";
 import type { EventsContextValue, WorkshopEvent } from "@/types";
 import { dayjs } from "@/utils/time";
 import { createContext, type ReactNode, useCallback, useMemo } from "react";
-import useWebhook from "@/hooks/useWebhook";
 
 export const EventsContext = createContext<EventsContextValue | null>(null);
 
@@ -11,7 +11,10 @@ interface EventsProviderProps {
 
 export function EventsProvider({ children }: EventsProviderProps) {
     const processData = useCallback((data: WorkshopEvent[]) => {
-        return [...data].sort((a, b) => new Date(a.Date).getTime() - new Date(b.Date).getTime());
+        // remove duplicates
+        const unique = [...new Set(data.map((item) => JSON.stringify(item)))].map((item) => JSON.parse(item));
+
+        return [...unique].sort((a, b) => new Date(a.Date).getTime() - new Date(b.Date).getTime());
     }, []);
 
     const events = useWebhook<WorkshopEvent[]>("ticker/workshops", 3600000, processData);

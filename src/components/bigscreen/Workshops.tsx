@@ -100,7 +100,7 @@ export default function Workshops({ callback }: WorkshopsProps) {
                 </Box>
             ) : (
                 <Flex justify="center" align="center" height="100%" width="100%">
-                    <p className="text-4xl font-medium text-[--gray-11]">No upcoming workshops</p>
+                    <p className="text-4xl font-medium text-[--gray-11]">No published workshops</p>
                 </Flex>
             )}
         </SlideTemplate>
