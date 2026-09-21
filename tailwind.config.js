@@ -1,6 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 import typography from "@tailwindcss/typography";
-import { themeVariants, prefersLight, prefersDark } from "tailwindcss-theme-variants";
+import { prefersDark, prefersLight, themeVariants } from "tailwindcss-theme-variants";
 
 const defaultTypograhyStyle = {
     marginTop: ".6em",
@@ -11,9 +11,9 @@ export default {
     content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
     theme: {
         fontFamily: {
-            sans: ['"Sora"', "sans-serif"],
-            serif: ['"Sora"', "serif"],
-            body: ['"Sora"', "sans-serif"],
+            sans: ['"Inter"', "sans-serif"],
+            serif: ['"Inter"', "serif"],
+            body: ['"Inter"', "sans-serif"],
             mono: ['"Azeret Mono"', "monospace"],
         },
         extend: {

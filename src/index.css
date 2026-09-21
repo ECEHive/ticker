@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 .radix-themes {
-    --default-font-family: "Sora", sans-serif;
+    --default-font-family: "Inter", sans-serif;
     --heading-font-family: "Rubik", sans-serif;
     /* --code-font-family:     Your custom font for <Code> components */
     /* --strong-font-family:   Your custom font for <Strong> components */

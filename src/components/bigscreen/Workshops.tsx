@@ -91,7 +91,7 @@ export default function Workshops({ callback }: WorkshopsProps) {
                                         </Flex>
                                     </Flex>
                                     <Flex direction="column" justify="center" align="center" width="100%" height="100%">
-                                        {previewUrl && <img src={previewUrl} className="h-full w-auto" alt={event.Name} />}
+                                        {previewUrl && <img src={previewUrl} className="h-full w-auto rounded-lg" alt={event.Name} />}
                                     </Flex>
                                 </Flex>
                             </Fragment>

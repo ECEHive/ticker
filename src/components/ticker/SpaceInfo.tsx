@@ -71,7 +71,7 @@ export default function SpaceInfo() {
                                     <p
                                         className={`${getDigit(time[0]) !== ":"
                                             ? "font-mono text-[9.8rem] font-semibold"
-                                            : "font-sans text-[9.8rem] font-medium"
+                                            : "font-sans text-[9.8rem] font-medium my-[-0.75rem]"
                                             } leading-none`}
                                     >
                                         {getDigit(time[0])}

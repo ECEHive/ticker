@@ -24,7 +24,7 @@ export default function Footer({ }) {
                                 <p
                                     className={`${getDigit(time[0]) !== ":"
                                         ? "font-mono text-[3.2rem] font-semibold"
-                                        : "font-sans text-[3.2rem] font-medium"
+                                        : "font-sans text-[3.2rem] font-medium my-[-1.8rem]"
                                         } leading-none`}
                                 >
                                     {getDigit(time[0])}
