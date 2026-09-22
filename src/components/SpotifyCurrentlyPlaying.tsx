@@ -84,10 +84,10 @@ export default function SpotifyCurrentlyPlaying({
 
     const TrackInfo = (
         <Flex dir="row" justify="center" align="center" gap="2" ref={titleRef} className="whitespace-nowrap">
-            <p className={`${titleSize} font-semibold leading-none text-gray-50 py-3`}>{track?.name}</p>
+            <p className={`${titleSize} font-semibold leading-none text-gray-50 overflow-y-visible py-1`}>{track?.name}</p>
             <DotFilledIcon width={dotSize} height={dotSize} className="mx-2" />
-            <p className={`${artistSize} font-normal leading-none text-gray-300 py-3`}>{artistNames}</p>
-        </Flex>
+            <p className={`${artistSize} font-normal leading-none text-gray-300 overflow-y-visible py-1`}>{artistNames}</p>
+        </Flex >
     );
 
     return (
