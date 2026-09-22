@@ -102,7 +102,7 @@ export default function SpotifyCurrentlyPlaying({
             justify="start"
             gap="5"
         >
-            {icon && <FaMusic size={iconSize} />}
+            {icon && <FaMusic size={iconSize} className="" />}
             <Flex
                 direction="column"
                 align="start"
