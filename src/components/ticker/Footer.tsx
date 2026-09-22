@@ -31,7 +31,7 @@ export default function Footer() {
                     style={{
                         backdropFilter:
                             spotifyEnabled && playerState
-                                ? `blur(75px) ${colorTheme === "dark" ? "brightness(0.2)" : "brightness(0.7)"}`
+                                ? `blur(75px) ${colorTheme === "dark" ? "brightness(0.15)" : "brightness(0.7)"}`
                                 : undefined,
                     }}
                 >
