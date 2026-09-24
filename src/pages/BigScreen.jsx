@@ -1,0 +1,112 @@
+import ErrorBoundary from "@/components/ErrorBoundary";
+import Calendar from "@/components/bigscreen/Calendar";
+import Footer from "@/components/bigscreen/Footer";
+import Hero from "@/components/bigscreen/Hero";
+import Printers from "@/components/bigscreen/Printers";
+import QRCodes from "@/components/bigscreen/QRCodes";
+import SlideTemplate from "@/components/bigscreen/SlideTemplate";
+import Workshops from "@/components/bigscreen/Workshops";
+import useWebhook from "@/hooks/useWebhook";
+import { Box, Flex } from "@radix-ui/themes";
+import { AnimatePresence, motion } from "motion/react";
+import { cloneElement, isValidElement, useCallback, useMemo, useState } from "react";
+
+const SPECIAL_SLIDES = [
+    { component: <Hero key="hero" />, id: "HERO" },
+    { component: <Printers key="printers" />, id: "QUEUES" },
+    { component: <Calendar key="calendar" />, id: "CALENDAR" },
+    { component: <Workshops key="workshops" />, id: "WORKSHOPS" },
+    { component: <QRCodes key="qrcodes" />, id: "LINKS" },
+];
+
+export default function BigScreen() {
+
+    const processSlides = useCallback((data) => {
+        return data;
+    }, []);
+
+    const rawSlides = useWebhook("ticker/bigslides", 60000, processSlides);
+
+    const slides = useMemo(() => {
+        if (!rawSlides) return [];
+        return rawSlides
+            // Filter out disabled slides
+            .filter((s) => s.Enabled)
+            // if specialID matches a special slide, use that component instead of the content
+            .map((s) => {
+                const specialSlide = SPECIAL_SLIDES.find((ss) => ss.id === s.SpecialID);
+                return {
+                    title: s.Title,
+                    specialId: s.SpecialID,
+                    image: s.Image,
+                    component: specialSlide ? specialSlide.component : null,
+                    enabled: s.Enabled,
+                };
+            });
+    }, [rawSlides]);
+
+    const [slideIndex, setSlideIndex] = useState(0);
+
+    const incrementSlide = useCallback(() => {
+        setSlideIndex((prev) => (prev + 1 >= slides.length ? 0 : prev + 1));
+    }, [slides]);
+
+    const currentSlide = useMemo(() => {
+        if (slides[slideIndex]?.component) {
+            return (
+                <Box p="7" width="100%" height="100%">
+                    {cloneElement(slides[slideIndex].component, {
+                        callback: incrementSlide,
+                    })}
+                </Box>
+            );
+        } else if (slides[slideIndex]?.image) {
+            console.log(slides[slideIndex].image)
+            return (
+                <SlideTemplate fullscreen timeout={10000} callback={incrementSlide}>
+                    <img src={slides[slideIndex].image[0].thumbnails.full.url} alt={slides[slideIndex].title} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                </SlideTemplate>
+            )
+        }
+        else {
+            return <div style={{ width: "100%", height: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}>No slide available</div>;
+        }
+    }, [slides, slideIndex, incrementSlide]);
+
+    return (
+        <Flex direction="column" height="100vh" width="100%" minWidth="100%" position="relative" overflow="hidden">
+            <Flex
+                direction="column"
+                flexGrow="1"
+                width="100%"
+                minWidth="100%"
+                position="relative"
+                justify="start"
+                align="start"
+                gap="6"
+                onClick={incrementSlide}
+                className="overflow-hidden"
+            >
+                <AnimatePresence mode="wait">
+                    <motion.div
+                        key={slideIndex}
+                        initial={{ x: 10, opacity: 0 }}
+                        animate={{ x: 0, opacity: 1 }}
+                        exit={{ x: -10, opacity: 0 }}
+                        transition={{ duration: 0.2 }}
+                        className="h-full max-h-full w-full max-w-full"
+                    >
+                        <ErrorBoundary>
+                            {isValidElement(currentSlide)
+                                ? currentSlide
+                                : null}
+                        </ErrorBoundary>
+                    </motion.div>
+                </AnimatePresence>
+            </Flex>
+            <Box minHeight="100px" maxHeight="100px" className="w-full relative border-t-[2px] border-solid border-[--sand-7]">
+                <Footer />
+            </Box>
+        </Flex>
+    );
+}
