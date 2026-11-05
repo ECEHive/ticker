@@ -21,15 +21,15 @@ function AppShell() {
                 <EventsProvider>
                     <SpotifyProvider>
                         <PrintersProvider>
-                        <Box
-                            maxWidth="100vw"
-                            maxHeight="100vh"
-                            minHeight="100vh"
-                            minWidth="100vw"
-                            width="100vw"
-                            height="100vh"
-                            overflow="hidden"
-                        >
+                            <Box
+                                maxWidth="100vw"
+                                maxHeight="100vh"
+                                minHeight="100vh"
+                                minWidth="100vw"
+                                width="100vw"
+                                height="100vh"
+                                overflow="hidden"
+                            >
                             <Config />
                             <Flex
                                 direction="column"
@@ -45,7 +45,7 @@ function AppShell() {
                                     <Route path="designer" element={<Designer />} />
                                 </Routes>
                             </Flex>
-                        </Box>
+                            </Box>
                         </PrintersProvider>
                     </SpotifyProvider>
                 </EventsProvider>
