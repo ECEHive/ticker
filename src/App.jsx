@@ -1,6 +1,7 @@
 import Config from "@/components/Config";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import { EventsProvider } from "@/contexts/EventsContext";
+import { PrintersProvider } from "@/contexts/PrintersContext";
 import { SpotifyProvider } from "@/contexts/SpotifyContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { TimeProvider } from "@/contexts/TimeContext";
@@ -19,6 +20,7 @@ function AppShell() {
             <TimeProvider>
                 <EventsProvider>
                     <SpotifyProvider>
+                        <PrintersProvider>
                         <Box
                             maxWidth="100vw"
                             maxHeight="100vh"
@@ -44,6 +46,7 @@ function AppShell() {
                                 </Routes>
                             </Flex>
                         </Box>
+                        </PrintersProvider>
                     </SpotifyProvider>
                 </EventsProvider>
             </TimeProvider>

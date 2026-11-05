@@ -1,18 +1,8 @@
-import bambuLogo from "@/assets/printing/bambu.svg";
-import formlabsLogo from "@/assets/printing/formlabs.svg";
-import useWebhook from "@/hooks/useWebhook";
+import usePrinters from "@/hooks/usePrinters";
 import { Flex, Grid, Spinner } from "@radix-ui/themes";
 import { motion } from "motion/react";
-import { useCallback } from "react";
 import { FaCubes, FaRegFaceFrown, FaRegFaceMeh, FaRegFaceSmile } from "react-icons/fa6";
 import SlideTemplate from "./SlideTemplate";
-
-function getPrinterImage(model) {
-    const lower = model.toLowerCase();
-    if (lower.includes("formlabs")) return formlabsLogo;
-    if (lower.includes("bambu")) return bambuLogo;
-    return undefined;
-}
 
 function getBambuMaterials(model) {
     const lower = model.toLowerCase();
@@ -96,17 +86,7 @@ function PrinterCard({ printer }) {
 }
 
 export default function Printers({ callback }) {
-    const processData = useCallback((data) => {
-        console.log(data);
-        return {
-            ...data,
-            printers: data.printers
-                .map((p) => ({ ...p, logo: getPrinterImage(p.printerModel) }))
-                .sort((a, b) => a.printerModel.localeCompare(b.printerModel)),
-        };
-    }, []);
-
-    const printerStates = useWebhook("queue", 60000, processData);
+    const { printerStates } = usePrinters();
 
     return (
         <SlideTemplate title="3D Printer Queues" callback={callback} timeout={20000}>
