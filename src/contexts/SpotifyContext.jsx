@@ -6,7 +6,7 @@ import {
     spotifyRequest
 } from "@/api/spotify";
 import { getStorageItem, removeStorageItem, setStorageItem } from "@/utils/storage";
-import React, { createContext, useCallback, useEffect, useState } from "react";
+import React, { createContext, useCallback, useEffect, useRef, useState } from "react";
 
 export const SpotifyContext = createContext(null);
 
@@ -85,8 +85,11 @@ export const SpotifyProvider = ({ children }) => {
         }
     }, [updateToken, setSpotifyEnabled]);
 
+    const currentTokenRef = useRef(currentToken);
+    currentTokenRef.current = currentToken;
+
     const request = useCallback(async (endpoint) => {
-        let token = currentToken;
+        let token = currentTokenRef.current;
 
         // Check if token is expired
         if (token.expires && new Date(token.expires) <= new Date() && token.refresh_token) {
@@ -112,17 +115,18 @@ export const SpotifyProvider = ({ children }) => {
         }
 
         return spotifyRequest(endpoint, token.access_token);
-    }, [currentToken, logOut, updateToken]);
+    }, [logOut, updateToken]);
 
     // Poll player state periodically if enabled and authenticated
     useEffect(() => {
-        if (!spotifyEnabled || !currentToken.access_token) {
+        if (!spotifyEnabled || !currentTokenRef.current.access_token) {
             setPlayerState(null);
             return;
         }
 
         let isMounted = true;
         const fetchPlayer = async () => {
+            if (!currentTokenRef.current.access_token) return;
             try {
                 const state = await request("/me/player");
                 // If it returned 204 or empty object, state might be empty
@@ -145,7 +149,7 @@ export const SpotifyProvider = ({ children }) => {
             isMounted = false;
             clearInterval(interval);
         };
-    }, [spotifyEnabled, currentToken.access_token, request]);
+    }, [spotifyEnabled, request]);
 
     const redirectToSpotifyAuthorizeWrapper = useCallback(() => {
         redirectToSpotify().catch(err => {

@@ -16,7 +16,8 @@ function getPrinterImage(model) {
 
 function getBambuMaterials(model) {
     const lower = model.toLowerCase();
-    if (lower.includes("p1s")) return "PLA, TPU";
+    if (lower.includes("p2s")) return "PLA";
+    if (lower.includes("p1s")) return "PLA, Speciality";
     if (lower.includes("h2d") || lower.includes("h2s")) return "Specialty";
     return "";
 }
@@ -96,6 +97,7 @@ function PrinterCard({ printer }) {
 
 export default function Printers({ callback }) {
     const processData = useCallback((data) => {
+        console.log(data);
         return {
             ...data,
             printers: data.printers

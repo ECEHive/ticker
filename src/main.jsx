@@ -1,4 +1,5 @@
 import "@radix-ui/themes/styles.css";
+import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { createHashRouter, RouterProvider } from "react-router";
 import App from "./App";
@@ -14,8 +15,8 @@ const router = createHashRouter([
 const root = document.getElementById("root");
 if (root) {
     createRoot(root).render(
-        // <StrictMode>
-        <RouterProvider router={router} />,
-        // </StrictMode>,
+        <StrictMode>
+            <RouterProvider router={router} />,
+        </StrictMode>,
     );
 }
