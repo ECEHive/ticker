@@ -20,7 +20,6 @@ const SPECIAL_SLIDES = [
 ];
 
 export default function BigScreen() {
-
     const processSlides = useCallback((data) => {
         return data;
     }, []);
@@ -29,20 +28,22 @@ export default function BigScreen() {
 
     const slides = useMemo(() => {
         if (!rawSlides) return [];
-        return rawSlides
-            // Filter out disabled slides
-            .filter((s) => s.Enabled)
-            // if specialID matches a special slide, use that component instead of the content
-            .map((s) => {
-                const specialSlide = SPECIAL_SLIDES.find((ss) => ss.id === s.SpecialID);
-                return {
-                    title: s.Title,
-                    specialId: s.SpecialID,
-                    image: s.Image,
-                    component: specialSlide ? specialSlide.component : null,
-                    enabled: s.Enabled,
-                };
-            });
+        return (
+            rawSlides
+                // Filter out disabled slides
+                .filter((s) => s.Enabled)
+                // if specialID matches a special slide, use that component instead of the content
+                .map((s) => {
+                    const specialSlide = SPECIAL_SLIDES.find((ss) => ss.id === s.SpecialID);
+                    return {
+                        title: s.Title,
+                        specialId: s.SpecialID,
+                        image: s.Image,
+                        component: specialSlide ? specialSlide.component : null,
+                        enabled: s.Enabled,
+                    };
+                })
+        );
     }, [rawSlides]);
 
     const [slideIndex, setSlideIndex] = useState(0);
@@ -61,15 +62,30 @@ export default function BigScreen() {
                 </Box>
             );
         } else if (slides[slideIndex]?.image) {
-            console.log(slides[slideIndex].image)
+            console.log(slides[slideIndex].image);
             return (
                 <SlideTemplate fullscreen timeout={10000} callback={incrementSlide}>
-                    <img src={slides[slideIndex].image[0].thumbnails.full.url} alt={slides[slideIndex].title} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                    <img
+                        src={slides[slideIndex].image[0].thumbnails.full.url}
+                        alt={slides[slideIndex].title}
+                        style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                    />
                 </SlideTemplate>
-            )
-        }
-        else {
-            return <div style={{ width: "100%", height: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}>No slide available</div>;
+            );
+        } else {
+            <SlideTemplate fullscreen timeout={10000} callback={incrementSlide}>
+                <div
+                    style={{
+                        width: "100%",
+                        height: "100%",
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                    }}
+                >
+                    No slide available
+                </div>
+            </SlideTemplate>;
         }
     }, [slides, slideIndex, incrementSlide]);
 
@@ -96,15 +112,15 @@ export default function BigScreen() {
                         transition={{ duration: 0.2 }}
                         className="h-full max-h-full w-full max-w-full"
                     >
-                        <ErrorBoundary>
-                            {isValidElement(currentSlide)
-                                ? currentSlide
-                                : null}
-                        </ErrorBoundary>
+                        <ErrorBoundary>{isValidElement(currentSlide) ? currentSlide : null}</ErrorBoundary>
                     </motion.div>
                 </AnimatePresence>
             </Flex>
-            <Box minHeight="100px" maxHeight="100px" className="w-full relative border-t-[2px] border-solid border-[--sand-7]">
+            <Box
+                minHeight="100px"
+                maxHeight="100px"
+                className="relative w-full border-t-[2px] border-solid border-[--sand-7]"
+            >
                 <Footer />
             </Box>
         </Flex>
