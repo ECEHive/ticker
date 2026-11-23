@@ -17,8 +17,9 @@ export function PrintersProvider({ children }) {
         return {
             ...data,
             printers: data.printers
-                .map((p) => ({ ...p, logo: getPrinterImage(p.printerModel) }))
-                .sort((a, b) => a.printerModel.localeCompare(b.printerModel)),
+                // .map((p) => ({ ...p, logo: getPrinterImage(p.printerModel) }))
+                .filter((p) => p?.printerModel)
+                .sort((a, b) => a?.printerModel.localeCompare(b?.printerModel)),
         };
     }, []);
 
@@ -26,10 +27,5 @@ export function PrintersProvider({ children }) {
 
     const value = useMemo(() => ({ printerStates }), [printerStates]);
 
-    return (
-        <PrintersContext.Provider value={value}>
-            {children}
-        </PrintersContext.Provider>
-    );
+    return <PrintersContext.Provider value={value}>{children}</PrintersContext.Provider>;
 }
-
